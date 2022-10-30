@@ -66,3 +66,6 @@ C:/Users/PC/source/repos/Insight_bott/Insight_bott/bin/Debug/net6.0/runtimes/win
 /Users/betehtin/Yandex.Disk.localized/Программирование/C#/repos/Insight_bott/Insight_bott/bin/Debug/net6.0/Carbon.VersionControl.dll
 /Users/betehtin/Yandex.Disk.localized/Программирование/C#/repos/Insight_bott/Insight_bott/bin/Debug/net6.0/Carbon.Versioning.dll
 /Users/betehtin/Yandex.Disk.localized/Программирование/C#/repos/Insight_bott/Insight_bott/bin/Debug/net6.0/GitHub.dll
+/Users/betehtin/Yandex.Disk.localized/Программирование/C#/repos/Insight_bott/Insight_bott/bin/Debug/net6.0/dotenv.net.dll
+/Users/betehtin/Yandex.Disk.localized/Программирование/C#/repos/Insight_bott/Insight_bott/bin/Debug/net6.0/DotNetEnv.dll
+/Users/betehtin/Yandex.Disk.localized/Программирование/C#/repos/Insight_bott/Insight_bott/bin/Debug/net6.0/Sprache.dll

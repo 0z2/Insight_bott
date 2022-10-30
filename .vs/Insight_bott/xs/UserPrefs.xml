@@ -10,8 +10,8 @@
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
-          <Node name="Insight_bott" expanded="True">
-            <Node name="Insight_bott" expanded="True" selected="True">
+          <Node name="Insight_bott" expanded="True" selected="True">
+            <Node name="Insight_bott" expanded="True">
               <Node name="Jobs" expanded="True" />
             </Node>
           </Node>

@@ -14,8 +14,12 @@ namespace Insight_bott.Jobs
 
         public Sender()
         {
+            // эта штука достает переменные из env файла. Вроде как env файл должен лежать в корне
+            DotNetEnv.Env.TraversePath().Load();
+            string telegramBotApiKey = Environment.GetEnvironmentVariable("TELEGRAM_API_KEY");
+            
             users = new Users();
-            Client = new TelegramBotClient("5465942614:AAHkdHQIxHrfHOboa3TlzV7gPHHYq00vdqA");
+            Client = new TelegramBotClient(telegramBotApiKey);
             Client.StartReceiving(Update, Error);
         }
 
