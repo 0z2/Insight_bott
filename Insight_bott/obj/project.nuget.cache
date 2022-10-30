@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "dgSpecHash": "xaKIyL8CXr4HMCgmCi7WUX7AaxIn6Ikgbep9GiS3/A/sWMKkEQVW89lvU6L4Kjit/kz/lNXi5erdU3faBv+pAw==",
+  "success": true,
+  "projectFilePath": "/Users/betehtin/Yandex.Disk.localized/Программирование/C#/repos/Insight_bott/Insight_bott/Insight_bott.csproj",
+  "expectedPackageFiles": [
+    "/Users/betehtin/.nuget/packages/carbon.data.protection/1.5.0/carbon.data.protection.1.5.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/carbon.packaging/1.50.0/carbon.packaging.1.50.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/carbon.storage/3.0.1/carbon.storage.3.0.1.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/carbon.versioncontrol/2.6.0/carbon.versioncontrol.2.6.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/carbon.versioning/2.0.1/carbon.versioning.2.0.1.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/github/1.34.0/github.1.34.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/microsoft.extensions.logging.abstractions/2.1.1/microsoft.extensions.logging.abstractions.2.1.1.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/microsoft.netcore.platforms/3.1.0/microsoft.netcore.platforms.3.1.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/microsoft.win32.systemevents/4.7.0/microsoft.win32.systemevents.4.7.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/newtonsoft.json/12.0.2/newtonsoft.json.12.0.2.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/quartz/3.5.0/quartz.3.5.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/system.configuration.configurationmanager/4.7.0/system.configuration.configurationmanager.4.7.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/system.diagnostics.diagnosticsource/4.7.1/system.diagnostics.diagnosticsource.4.7.1.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/system.drawing.common/4.7.0/system.drawing.common.4.7.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/system.security.accesscontrol/4.7.0/system.security.accesscontrol.4.7.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/system.security.cryptography.protecteddata/4.7.0/system.security.cryptography.protecteddata.4.7.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/system.security.permissions/4.7.0/system.security.permissions.4.7.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/system.security.principal.windows/4.7.0/system.security.principal.windows.4.7.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/system.windows.extensions/4.7.0/system.windows.extensions.4.7.0.nupkg.sha512",
+    "/Users/betehtin/.nuget/packages/telegram.bot/18.0.0/telegram.bot.18.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
