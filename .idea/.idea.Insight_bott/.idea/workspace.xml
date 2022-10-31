@@ -5,81 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a9184361-34c5-48f6-bde8-2887d70aefd5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.Insight_bott/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InsightBot/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InsightBot/InsightBot.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InsightBot/Jobs/Sender.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InsightBot/Jobs/Sheduler.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InsightBot/Program.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InsightBot/Properties/launchSettings.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InsightBot/User.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/InsightBot/Users.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Insight_bott/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Insight_bott/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Insight_bott/.idea/indexLayout.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Insight_bott/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott.sln" beforeDir="false" afterPath="$PROJECT_DIR$/InsigntBot.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/.env" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/Insight_bott.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/Insight_bott.csproj.user" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/Jobs/Sender.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/Jobs/Sheduler.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/Program.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/Properties/launchSettings.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/User.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/Users.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Carbon.Data.Protection.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Carbon.Packaging.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Carbon.Storage.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Carbon.VersionControl.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Carbon.Versioning.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/GitHub.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Insight_bott" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Insight_bott.deps.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Insight_bott.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Insight_bott.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Insight_bott.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Insight_bott.runtimeconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Microsoft.Extensions.Logging.Abstractions.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Microsoft.Win32.SystemEvents.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Newtonsoft.Json.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Quartz.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/System.Configuration.ConfigurationManager.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/System.Drawing.Common.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/System.Security.Cryptography.ProtectedData.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/System.Security.Permissions.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/System.Windows.Extensions.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/Telegram.Bot.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/runtimes/unix/lib/netcoreapp3.0/System.Drawing.Common.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/runtimes/win/lib/netcoreapp3.0/Microsoft.Win32.SystemEvents.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/runtimes/win/lib/netcoreapp3.0/System.Drawing.Common.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/runtimes/win/lib/netcoreapp3.0/System.Windows.Extensions.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/bin/Debug/net6.0/runtimes/win/lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/.NETCoreApp,Version=v6.0.AssemblyAttributes.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.AssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.AssemblyInfoInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.GlobalUsings.g.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.assets.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.csproj.AssemblyReference.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.csproj.BuildWithSkipAnalyzers" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.csproj.CopyComplete" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.csproj.CoreCompileInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.csproj.FileListAbsolute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.genruntimeconfig.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/Insight_bott.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/apphost" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/apphost.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/ref/Insight_bott.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Debug/net6.0/refint/Insight_bott.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Insight_bott.csproj.nuget.dgspec.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Insight_bott.csproj.nuget.g.props" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/Insight_bott.csproj.nuget.g.targets" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/project.assets.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/project.nuget.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insight_bott/obj/project.packagespec.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Insight_bott/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Insight_bott/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -147,7 +73,7 @@
       <workItem from="1667147095634" duration="4582000" />
       <workItem from="1667163245585" duration="3719000" />
       <workItem from="1667166974289" duration="24000" />
-      <workItem from="1667167019772" duration="752000" />
+      <workItem from="1667167019772" duration="1646000" />
     </task>
     <task id="LOCAL-00001" summary="start commit">
       <created>1667165927805</created>
