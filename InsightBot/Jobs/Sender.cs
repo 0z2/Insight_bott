@@ -19,7 +19,7 @@ namespace Insight_bott.Jobs
             string telegramBotApiKey = Environment.GetEnvironmentVariable("TELEGRAM_API_KEY");
             
             users = new Users();
-            Client = new TelegramBotClient("5465942614:AAHkdHQIxHrfHOboa3TlzV7gPHHYq00vdqA");
+            Client = new TelegramBotClient(telegramBotApiKey);
             Client.StartReceiving(Update, Error);
         }
 
