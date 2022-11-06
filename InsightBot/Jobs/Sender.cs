@@ -4,12 +4,14 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using System.Data.Entity;
+using System.Threading.Tasks;
 
 namespace Insight_bott.Jobs
 {
     public class Sender : IJob
     {
-        Users users;
+
         TelegramBotClient Client;
 
         public Sender()
@@ -18,7 +20,6 @@ namespace Insight_bott.Jobs
             DotNetEnv.Env.TraversePath().Load();
             string telegramBotApiKey = Environment.GetEnvironmentVariable("TELEGRAM_API_KEY");
             
-            users = new Users();
             Client = new TelegramBotClient(telegramBotApiKey);
             Client.StartReceiving(Update, Error);
         }
@@ -49,26 +50,65 @@ namespace Insight_bott.Jobs
                 }
                 else if (message.Text.ToLower() == "/start")
                 {
-                    long userTelegramId = message.Chat.Id;
-                    Insight_bott.User newUser = new Insight_bott.User(userTelegramId); // добавить проверку на случай, если пользователь уже есть в базе
-                    users.ListOfUsers.Add(newUser);
+                    var userTelegramId = message.Chat.Id; // id того кто запросил мысль
+
+                    // создаем нового пользователя и добавляем в DB
+                    await using (ApplicationContext db = new ApplicationContext())
+                    {
+                        Console.WriteLine("Пользователь добавлен!");
+                        Insight_bott.User newUser = new Insight_bott.User(userTelegramId); // добавить проверку на случай, если пользователь уже есть в базе
+                        db.Users.AddRange(newUser);
+                        await db.SaveChangesAsync(token);
+                    }
+                    
+                    
                     await botClient.SendTextMessageAsync(message.Chat.Id, "Добро пожаловать!");
                     return;
                 }
+                
                 else if (message.Text.ToLower() == "/get_thought")
                 {
-                    Insight_bott.User currentUser = users.ReturnUser(message.Chat.Id);
-                    if (currentUser == null) // заплатка на случай если пользователя нет в списке пользователей, но он отправил сообщение
+                    var currentUserTgId = message.Chat.Id;
+                    User currentUser = null; //юзер который запросил мысль
+                    
+                    // получение данных
+                    await using (ApplicationContext db = new ApplicationContext())
                     {
+                        bool isAvalaible = db.Database.CanConnect();
+                        // bool isAvalaible2 = await db.Database.CanConnectAsync();
+                        if (isAvalaible) Console.WriteLine("База данных доступна");
+                        else Console.WriteLine("База данных не доступна");
+                        
+                        // получаем объекты из бд и выводим на консоль
+                        var users = db.Users.ToList();
+                        Console.WriteLine("Users list:");
+                        foreach (User u in users)
+                        {
+                            Console.WriteLine($"{u.Id} - при нажатии /get_thought");
+                        }
+                        
+                        foreach (var user in users)
+                        {
+                            if (user.Id == currentUserTgId)
+                            {
+                                currentUser = user;
+                            }
+                        }
+
+                        if (currentUser == null) // заплатка на случай если пользователя нет в списке пользователей, но он отправил сообщение
+                        {
+
+                        }
+                        else
+                        {
+                            string currentUserThought = currentUser.GetCurrentThought();
+                            await botClient.SendTextMessageAsync(message.Chat.Id, currentUserThought);
+                        }
 
                     }
-                    else
-                    {
-                        string currentUserThought = currentUser.GetCurrentThought();
-                        await botClient.SendTextMessageAsync(message.Chat.Id, currentUserThought);
                     }
 
-                }
+
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,11 +11,12 @@ namespace Insight_bott
     {
         public List<String> Thoughts; 
         public int NumberOfLastThought { get; set; }
-        public long UserTelegramId { get; set; }
+        
+        public long Id { get; set; }
 
-        public User(long userTelegramId)
+        public User(long id)
         {
-            UserTelegramId = userTelegramId;
+            Id = id;
             Thoughts = new List<String>()
             {
                 "Глаза боятся - руки делают!", "Тише едешь - дальше будешь!", "Утро вечера мудренее!"
