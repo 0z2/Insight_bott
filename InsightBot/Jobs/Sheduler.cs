@@ -22,7 +22,7 @@ namespace Insight_bott.Jobs
                 .WithIdentity("trigger1", "group1")     // идентифицируем триггер с именем и группой
                 .StartNow()                            // запуск сразу после начала выполнения
                 .WithSimpleSchedule(x => x            // настраиваем выполнение действия
-                    .WithIntervalInMinutes(1)         // через 1 минуту
+                    .WithIntervalInMinutes(60)         // через 1 минуту
                     .RepeatForever())                   // бесконечное повторение
                 .Build();
 

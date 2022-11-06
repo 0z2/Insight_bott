@@ -51,14 +51,28 @@ namespace Insight_bott.Jobs
                 else if (message.Text.ToLower() == "/start")
                 {
                     var userTelegramId = message.Chat.Id; // id того кто запросил мысль
-
-                    // создаем нового пользователя и добавляем в DB
+                    var isAlreadyInBase = false;
+                    
+                    // работаем с новым пользователем
                     await using (ApplicationContext db = new ApplicationContext())
                     {
-                        Console.WriteLine("Пользователь добавлен!");
-                        Insight_bott.User newUser = new Insight_bott.User(userTelegramId); // добавить проверку на случай, если пользователь уже есть в базе
-                        db.Users.AddRange(newUser);
-                        await db.SaveChangesAsync(token);
+                        // получаем список пользователей из БД
+                        var users = db.Users.ToList();
+                        // проверяем есть ли пользователь уже в базе
+                        foreach (User u in users)
+                        {
+                            if (u.Id == userTelegramId)
+                            {
+                                isAlreadyInBase = true;
+                            }
+                        }
+                        //если пользователя нет в базе, тогда добавляем
+                        if (isAlreadyInBase == false)
+                        {
+                            Insight_bott.User newUser = new Insight_bott.User(userTelegramId);
+                            db.Users.AddRange(newUser);
+                            await db.SaveChangesAsync(token);
+                        }
                     }
                     
                     
@@ -74,11 +88,6 @@ namespace Insight_bott.Jobs
                     // получение данных
                     await using (ApplicationContext db = new ApplicationContext())
                     {
-                        bool isAvalaible = db.Database.CanConnect();
-                        // bool isAvalaible2 = await db.Database.CanConnectAsync();
-                        if (isAvalaible) Console.WriteLine("База данных доступна");
-                        else Console.WriteLine("База данных не доступна");
-                        
                         // получаем объекты из бд и выводим на консоль
                         var users = db.Users.ToList();
                         Console.WriteLine("Users list:");
@@ -106,7 +115,7 @@ namespace Insight_bott.Jobs
                         }
 
                     }
-                    }
+                }
 
 
             }
