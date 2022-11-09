@@ -7,6 +7,7 @@ public class ApplicationContext : DbContext
 {
     
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Insight> Insights { get; set; } = null!;
 
     public ApplicationContext()
     {
