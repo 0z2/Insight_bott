@@ -15,7 +15,7 @@ namespace Insight_bott
         public List<Insight> Insights; 
         public int NumberOfLastThought { get; set; }
         
-        //public bool WantToAddAnInsight { get; set; }
+        public bool WantToAddAnInsight { get; set; }
         
         
         public User(long telegramId)
@@ -40,7 +40,7 @@ namespace Insight_bott
 
         public string GetCurrentThought()
         {
-            using (ApplicationContext db = new ApplicationContext()) //подключаемся к контексту БД
+            //using (ApplicationContext db = new ApplicationContext()) //подключаемся к контексту БД
             {
                 Insight currentInsight = Insights[NumberOfLastThought];
 
@@ -54,7 +54,7 @@ namespace Insight_bott
                     NumberOfLastThought++;
                 }
                 
-                db.SaveChangesAsync(); // разобраться что это за токен такой и для чего он нужен
+               // db.SaveChangesAsync(); // разобраться что это за токен такой и для чего он нужен
 
                 return $"{currentInsight.TextOfInsight} - id {currentInsight.InsightId}";
                 
@@ -62,9 +62,9 @@ namespace Insight_bott
             
         }
 
-        public void AddNewInsight(string textOfInsight, long telegramId)
+        public void AddNewInsight(string textOfInsight)
         {
-            var newInsight = new Insight(textOfInsight, telegramId);
+            var newInsight = new Insight(textOfInsight, TelegramId);
             Insights.Add(newInsight);
         }
     }

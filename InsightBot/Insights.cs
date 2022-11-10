@@ -11,8 +11,7 @@ public class Insight
     
     // разобраться почему связь не образауется и данные не попадают в базу!
     public long UserTelegramId { get; set; }      // внешний ключ
-    public User User { get; set; } // навигационное свойство
-    
+
     public string TextOfInsight { get; set; }
     
     public Insight(string textOfInsight, long userTelegramId)

@@ -39,7 +39,7 @@ namespace Insight_bott.Jobs
         {
             var message = update.Message;
             var currentUserTgId = message.Chat.Id;
-            var listOfCommands = new List<string>() { "/start", "здорова", "/get_thought" };
+            var listOfCommands = new List<string>() { "/start", "здорова", "/get_thought", "/add_new_insight"};
             
             if (message.Text != null)
             {
@@ -61,9 +61,30 @@ namespace Insight_bott.Jobs
                     {
                         AnswersMethods.GetThought(Client, botClient, message, currentUserTgId, token);
                     }
+                    
+                    else if (message.Text.ToLower() == "/add_new_insight")
+                    {
+                        await using (ApplicationContext db = new ApplicationContext())
+                        {
+                            User currentUserFromDb = Users.GetUser(currentUserTgId, token, db); //юзер который запросил мысль
+                            currentUserFromDb.WantToAddAnInsight = true;
+                            await botClient.SendTextMessageAsync(message.Chat.Id, "Введите текст инсайта");
+                            await db.SaveChangesAsync(token); // сохранение 
+                        }
+                    }
                 }
                 else
                 {
+                    await using (ApplicationContext db = new ApplicationContext())
+                    {
+                        User currentUserFromDb = Users.GetUser(currentUserTgId, token, db); //юзер который запросил мысль
+                        if (currentUserFromDb.WantToAddAnInsight)
+                        {
+                            currentUserFromDb.AddNewInsight(message.Text);
+                            await botClient.SendTextMessageAsync(message.Chat.Id, "Инсайт сохранен");
+                        }
+                        await db.SaveChangesAsync(token); // сохранение 
+                    }
                     
                 }
                 
