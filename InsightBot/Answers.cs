@@ -41,29 +41,13 @@ public static class AnswersMethods
     {
         await botClient.SendTextMessageAsync(message.Chat.Id, "Здоровей видали");
     }
-    public static async void GetThought(TelegramBotClient сlient,ITelegramBotClient botClient, Message message, long currentUserTgId, CancellationToken token)
+
+    public static async void GetThought(TelegramBotClient сlient, ITelegramBotClient botClient, Message message,
+        long currentUserTgId, CancellationToken token)
     {
-        User currentUserFromDb = null; //юзер который запросил мысль
-                    
-        // получение данных
         await using (ApplicationContext db = new ApplicationContext())
         {
-            // получаем объекты из бд и выводим на консоль
-            var users = db.Users.ToList();
-            Console.WriteLine("Users list:");
-            foreach (User u in users)
-            {
-                Console.WriteLine($"{u.TelegramId} - при нажатии /get_thought");
-            }
-                        
-            //находим юзера, который запросил мысль
-            foreach (var user in users)
-            {
-                if (user.TelegramId == currentUserTgId)
-                {
-                    currentUserFromDb = user;
-                }
-            }
+            User currentUserFromDb = Users.GetUser(currentUserTgId, token, db); //юзер который запросил мысль
 
             if (currentUserFromDb == null) // заплатка на случай если пользователя нет в списке пользователей, но он отправил сообщение
             {
@@ -74,11 +58,14 @@ public static class AnswersMethods
             else
             {
                 string currentUserThought = currentUserFromDb.GetCurrentThought();
+
                 await botClient.SendTextMessageAsync(message.Chat.Id, currentUserThought);
             }
-            await db.SaveChangesAsync(token); // сохранение для изменения номера последней мысли
 
+            await db.SaveChangesAsync(token); // сохранение для изменения номера последней мысли
         }
+
     }
-    
 }
+
+

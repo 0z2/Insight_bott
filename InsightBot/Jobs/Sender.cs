@@ -39,25 +39,34 @@ namespace Insight_bott.Jobs
         {
             var message = update.Message;
             var currentUserTgId = message.Chat.Id;
+            var listOfCommands = new List<string>() { "/start", "здорова", "/get_thought" };
             
             if (message.Text != null)
             {
                 Console.WriteLine($" {message.Chat.Id} сделал запрос.");
-                
-                if (message.Text.ToLower() == "/start")
+
+                if (listOfCommands.Contains(message.Text))
                 {
-                  AnswersMethods.Start(botClient, message, currentUserTgId, token);
+                    if (message.Text.ToLower() == "/start")
+                    {
+                        AnswersMethods.Start(botClient, message, currentUserTgId, token);
+                    }
+                
+                    else if (message.Text.ToLower().Contains("здорова"))
+                    {
+                        AnswersMethods.Zdorova(botClient, message);
+                    }
+                
+                    else if (message.Text.ToLower() == "/get_thought")
+                    {
+                        AnswersMethods.GetThought(Client, botClient, message, currentUserTgId, token);
+                    }
+                }
+                else
+                {
+                    
                 }
                 
-                else if (message.Text.ToLower().Contains("здорова"))
-                {
-                    AnswersMethods.Zdorova(botClient, message);
-                }
-                
-                else if (message.Text.ToLower() == "/get_thought")
-                {
-                    AnswersMethods.GetThought(Client, botClient, message, currentUserTgId, token);
-                }
             }
         }
     }
