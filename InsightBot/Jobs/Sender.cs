@@ -6,6 +6,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using System.Data.Entity;
 using System.Threading.Tasks;
+using EntityState = Microsoft.EntityFrameworkCore.EntityState;
 
 namespace Insight_bott.Jobs
 {
@@ -68,8 +69,8 @@ namespace Insight_bott.Jobs
                         {
                             User currentUserFromDb = Users.GetUser(currentUserTgId, token, db); //юзер который запросил мысль
                             currentUserFromDb.WantToAddAnInsight = true;
-                            await botClient.SendTextMessageAsync(message.Chat.Id, "Введите текст инсайта");
                             await db.SaveChangesAsync(token); // сохранение 
+                            await botClient.SendTextMessageAsync(message.Chat.Id, "Введите текст инсайта");
                         }
                     }
                 }
@@ -78,16 +79,19 @@ namespace Insight_bott.Jobs
                     await using (ApplicationContext db = new ApplicationContext())
                     {
                         User currentUserFromDb = Users.GetUser(currentUserTgId, token, db); //юзер который запросил мысль
+                        
                         if (currentUserFromDb.WantToAddAnInsight)
                         {
                             currentUserFromDb.AddNewInsight(message.Text);
-                            await botClient.SendTextMessageAsync(message.Chat.Id, "Инсайт сохранен");
                         }
-                        await db.SaveChangesAsync(token); // сохранение 
+                        await db.SaveChangesAsync(); // сохранение 
+                        await botClient.SendTextMessageAsync(message.Chat.Id, "Инсайт сохранен");
+
                     }
-                    
+
+
                 }
-                
+
             }
         }
     }

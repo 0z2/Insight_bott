@@ -6,6 +6,7 @@ public class Users
     {
         // получение данных
         var users = db.Users.ToList();
+        var insights = db.Insights.ToList();
         User currentUserFromDb = null;
         
 

@@ -12,39 +12,33 @@ namespace Insight_bott
     {
         [Key]
         public long TelegramId { get; set; }
-        public List<Insight> Insights; 
+        public List<Insight> Insights { get; set; } = new();
         public int NumberOfLastThought { get; set; }
-        
         public bool WantToAddAnInsight { get; set; }
-        
         
         public User(long telegramId)
         {
             
             TelegramId = telegramId;
-            //WantToAddAnInsight = false;
+            WantToAddAnInsight = false;
             
             var startInsights = new List<string>()
             {
                 "Глаза боятся - руки делают!", "Тише едешь - дальше будешь!", "Утро вечера мудренее!"
             };
             
-            Insights = new List<Insight>();
             foreach (var textOfInsight in startInsights)
             {
-                var newInsight = new Insight(textOfInsight, telegramId);
-                Insights.Add(newInsight);
+                AddNewInsight(textOfInsight);
             }
             NumberOfLastThought = 0;
         }
 
         public string GetCurrentThought()
         {
-            //using (ApplicationContext db = new ApplicationContext()) //подключаемся к контексту БД
             {
                 Insight currentInsight = Insights[NumberOfLastThought];
 
-                // если мысль является последней, то начинаем сначала
                 if (Insights.Count-1 == NumberOfLastThought)
                 {
                     NumberOfLastThought = 0;
@@ -54,9 +48,7 @@ namespace Insight_bott
                     NumberOfLastThought++;
                 }
                 
-               // db.SaveChangesAsync(); // разобраться что это за токен такой и для чего он нужен
-
-                return $"{currentInsight.TextOfInsight} - id {currentInsight.InsightId}";
+                return $"{currentInsight.TextOfInsight}";
                 
             }
             
@@ -64,7 +56,7 @@ namespace Insight_bott
 
         public void AddNewInsight(string textOfInsight)
         {
-            var newInsight = new Insight(textOfInsight, TelegramId);
+            var newInsight = new Insight(textOfInsight);
             Insights.Add(newInsight);
         }
     }
