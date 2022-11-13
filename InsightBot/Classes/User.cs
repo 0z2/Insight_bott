@@ -22,15 +22,15 @@ namespace Insight_bott
             TelegramId = telegramId;
             WantToAddAnInsight = false;
             
-            var startInsights = new List<string>()
-            {
-                "Глаза боятся - руки делают!", "Тише едешь - дальше будешь!", "Утро вечера мудренее!"
-            };
-            
-            foreach (var textOfInsight in startInsights)
-            {
-                AddNewInsight(textOfInsight);
-            }
+            // var startInsights = new List<string>()
+            // {
+            //     "Глаза боятся - руки делают!", "Тише едешь - дальше будешь!", "Утро вечера мудренее!"
+            // };
+            //
+            // foreach (var textOfInsight in startInsights)
+            // {
+            //     AddNewInsight(textOfInsight);
+            // }
             NumberOfLastThought = 0;
         }
 

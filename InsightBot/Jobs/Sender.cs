@@ -67,7 +67,7 @@ namespace Insight_bott.Jobs
                     {
                         await using (ApplicationContext db = new ApplicationContext())
                         {
-                            Users.GetUser(in currentUserTgId, in token, in db, out User currentUserFromDb); //юзер который запросил мысль
+                            Users.GetUser(currentUserTgId, in token, in db, out User currentUserFromDb); //юзер который запросил мысль
                             currentUserFromDb.WantToAddAnInsight = true;
                             await db.SaveChangesAsync(token); // сохранение 
                             await botClient.SendTextMessageAsync(message.Chat.Id, "Введите текст инсайта");
@@ -78,14 +78,14 @@ namespace Insight_bott.Jobs
                 {
                     await using (ApplicationContext db = new ApplicationContext())
                     {
-                        Users.GetUser(in currentUserTgId, in token, in db, out User currentUserFromDb); //юзер который запросил мысль
+                        Users.GetUser(currentUserTgId, in token, in db, out User currentUserFromDb); //юзер который запросил мысль
                         
                         if (currentUserFromDb.WantToAddAnInsight)
                         {
                             currentUserFromDb.AddNewInsight(message.Text);
+                            await db.SaveChangesAsync(); // сохранение 
                         }
                         
-                        await db.SaveChangesAsync(); // сохранение 
                         await botClient.SendTextMessageAsync(message.Chat.Id, "Инсайт сохранен");
 
                     }

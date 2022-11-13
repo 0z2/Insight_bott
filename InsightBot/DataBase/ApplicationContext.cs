@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore.Diagnostics;
+
 namespace Insight_bott;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +16,7 @@ public class ApplicationContext : DbContext
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres");
+        optionsBuilder
+            .UseNpgsql("Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres");
     }
 }

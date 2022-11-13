@@ -18,22 +18,30 @@ public static class AnswersMethods
         // работаем с пользователем нажавшим start
         await using (ApplicationContext db = new ApplicationContext()) //подключаемся к контексту БД
         {
-            // получаем список пользователей из БД
-            var users = db.Users.ToList();
-            // проверяем есть ли пользователь уже в базе
-            foreach (User u in users)
+            // пытаемся найти пользователя
+            var user = db.Users.Find(currentUserTgId);
+            
+            // если пользователь существует сообщаем об это
+            if (user is not null)
             {
-                if (u.TelegramId == currentUserTgId)
-                {
-                    isAlreadyInBase = true;
-                    await botClient.SendTextMessageAsync(message.Chat.Id, "Вы уже есть в списке пользователей.");
-                }
+                isAlreadyInBase = true;
+                await botClient.SendTextMessageAsync(message.Chat.Id, "Вы уже есть в списке пользователей.");
             }
             //если пользователя нет в базе, тогда добавляем
-            if (isAlreadyInBase == false)
+            else if (isAlreadyInBase == false)
             {
                 Insight_bott.User newUser = new Insight_bott.User(currentUserTgId);
-                db.Users.AddRange(newUser); // добавляем в таблицу нового пользователя. 
+                // добавляем стартовый набор инсайтов
+                var startInsights = new List<string>()
+                {
+                    "Глаза боятся - руки делают!", "Тише едешь - дальше будешь!", "Утро вечера мудренее!"
+                };
+                foreach (var textOfInsight in startInsights)
+                {
+                    newUser.AddNewInsight(textOfInsight);
+                }
+                db.Users.Add(newUser); // добавляем в таблицу нового пользователя
+                
                 await botClient.SendTextMessageAsync(message.Chat.Id, "Вы были добавлены в список пользователей.");
                 // сохраняем изменения в таблице
                 await db.SaveChangesAsync(token); // разобраться что это за токен такой и для чего он нужен
@@ -56,7 +64,7 @@ public static class AnswersMethods
     {
         await using (ApplicationContext db = new ApplicationContext())
         {
-            Users.GetUser(in currentUserTgId, in token, in db, out User currentUserFromDb); //юзер который запросил мысль
+            Users.GetUser(currentUserTgId, in token, in db, out User currentUserFromDb); //юзер который запросил мысль
             var insights = db.Insights.ToList();
             // ??? Почему если эта строка отсутствует, то список инсайтов не отображается коректно???
             // если ее не писать, то отображается три инсайта добавленных при создании юзера
