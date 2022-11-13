@@ -84,6 +84,7 @@ namespace Insight_bott.Jobs
                         {
                             currentUserFromDb.AddNewInsight(message.Text);
                         }
+                        
                         await db.SaveChangesAsync(); // сохранение 
                         await botClient.SendTextMessageAsync(message.Chat.Id, "Инсайт сохранен");
 
