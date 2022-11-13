@@ -10,7 +10,10 @@ public class Users
         in ApplicationContext db,
         out User? currentUserFromDb)
     {
-        User? user = db.Users.Find(currentUserTgId);
+        // получаем пользователя вместе с его список инсайтов
+        // подробнее про то как работает здесь https://metanit.com/sharp/efcore/3.8.php
+        var user = db.Users.Find(currentUserTgId);
+        db.Entry(user).Collection(c => c.Insights).Load();
         currentUserFromDb = user;
     }
 }

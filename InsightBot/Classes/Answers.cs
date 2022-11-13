@@ -65,7 +65,7 @@ public static class AnswersMethods
         await using (ApplicationContext db = new ApplicationContext())
         {
             Users.GetUser(currentUserTgId, in token, in db, out User currentUserFromDb); //юзер который запросил мысль
-            var insights = db.Insights.ToList();
+            //var insights = db.Insights.ToList();
             // ??? Почему если эта строка отсутствует, то список инсайтов не отображается коректно???
             // если ее не писать, то отображается три инсайта добавленных при создании юзера
             // в дальнейшем добавленные инсайты добавляются в базу, но при запросе юзера не выводятся
