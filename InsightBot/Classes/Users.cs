@@ -2,13 +2,15 @@ namespace Insight_bott;
 
 public class Users
 {
-    public static User GetUser(long currentUserTgId, CancellationToken token, ApplicationContext db)
+    public static void GetUser(
+        in long currentUserTgId, 
+        in CancellationToken token, 
+        in ApplicationContext db,
+        out User? currentUserFromDb)
     {
         // получение данных
         var users = db.Users.ToList();
-        var insights = db.Insights.ToList();
-        User currentUserFromDb = null;
-        
+        currentUserFromDb = null;
 
         //находим юзера, который запросил мысль
         foreach (var user in users)
@@ -19,7 +21,5 @@ public class Users
                 break;
             }
         }
-        return currentUserFromDb;
-        
     }
 }

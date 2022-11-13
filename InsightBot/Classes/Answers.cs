@@ -7,7 +7,11 @@ namespace Insight_bott;
 public static class AnswersMethods
 {
 
-    public static async void Start(ITelegramBotClient botClient, Message message, long currentUserTgId, CancellationToken token)
+    public static async void Start(
+        ITelegramBotClient botClient,
+        Message message,
+        long currentUserTgId,
+        CancellationToken token)
     {
         var isAlreadyInBase = false;
                     
@@ -43,24 +47,34 @@ public static class AnswersMethods
         await botClient.SendTextMessageAsync(message.Chat.Id, "Здоровей видали");
     }
 
-    public static async void GetThought(TelegramBotClient сlient, ITelegramBotClient botClient, Message message,
-        long currentUserTgId, CancellationToken token)
+    public static async void GetInsight(
+        TelegramBotClient сlient,
+        ITelegramBotClient botClient,
+        Message message,
+        long currentUserTgId,
+        CancellationToken token)
     {
         await using (ApplicationContext db = new ApplicationContext())
         {
-            User currentUserFromDb = Users.GetUser(currentUserTgId, token, db); //юзер который запросил мысль
+            Users.GetUser(in currentUserTgId, in token, in db, out User currentUserFromDb); //юзер который запросил мысль
+            var insights = db.Insights.ToList();
+            // ??? Почему если эта строка отсутствует, то список инсайтов не отображается коректно???
+            // если ее не писать, то отображается три инсайта добавленных при создании юзера
+            // в дальнейшем добавленные инсайты добавляются в базу, но при запросе юзера не выводятся
+            // причем список инсайтов судя по всему в юзера добавляется дополнительный (то есть вместо трех инсайтов
+            // которые действительно есть у юзера после вывоза списка инсайтов их становится семь
 
             if (currentUserFromDb == null) // заплатка на случай если пользователя нет в списке пользователей, но он отправил сообщение
             {
-                Message message2 = await сlient.SendTextMessageAsync(
+                await сlient.SendTextMessageAsync(
                     chatId: 985485455,
                     text: $"Пользователь которого нет в базе запросил мыcль. tgId пользователя: {currentUserTgId}");
             }
             else
             {
-                string currentUserThought = currentUserFromDb.GetCurrentThought();
+                currentUserFromDb.GetCurrentThought(out string textOfCurrentUserInsight);
 
-                await botClient.SendTextMessageAsync(message.Chat.Id, currentUserThought);
+                await botClient.SendTextMessageAsync(message.Chat.Id, textOfCurrentUserInsight);
             }
 
             await db.SaveChangesAsync(token); // сохранение для изменения номера последней мысли

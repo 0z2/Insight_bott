@@ -1,4 +1,3 @@
-using Insight_bott;
 namespace Insight_bott;
 using Microsoft.EntityFrameworkCore;
 

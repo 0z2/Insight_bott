@@ -60,14 +60,14 @@ namespace Insight_bott.Jobs
                 
                     else if (message.Text.ToLower() == "/get_thought")
                     {
-                        AnswersMethods.GetThought(Client, botClient, message, currentUserTgId, token);
+                        AnswersMethods.GetInsight(Client, botClient, message, currentUserTgId, token);
                     }
                     
                     else if (message.Text.ToLower() == "/add_new_insight")
                     {
                         await using (ApplicationContext db = new ApplicationContext())
                         {
-                            User currentUserFromDb = Users.GetUser(currentUserTgId, token, db); //юзер который запросил мысль
+                            Users.GetUser(in currentUserTgId, in token, in db, out User currentUserFromDb); //юзер который запросил мысль
                             currentUserFromDb.WantToAddAnInsight = true;
                             await db.SaveChangesAsync(token); // сохранение 
                             await botClient.SendTextMessageAsync(message.Chat.Id, "Введите текст инсайта");
@@ -78,7 +78,7 @@ namespace Insight_bott.Jobs
                 {
                     await using (ApplicationContext db = new ApplicationContext())
                     {
-                        User currentUserFromDb = Users.GetUser(currentUserTgId, token, db); //юзер который запросил мысль
+                        Users.GetUser(in currentUserTgId, in token, in db, out User currentUserFromDb); //юзер который запросил мысль
                         
                         if (currentUserFromDb.WantToAddAnInsight)
                         {
