@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using System.Data.Entity;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using EntityState = Microsoft.EntityFrameworkCore.EntityState;
 
@@ -27,8 +28,12 @@ namespace Insight_bott.Jobs
         
         public async Task Execute(IJobExecutionContext context)
         {
+            // эта штука достает переменные из env файла. Вроде как env файл должен лежать в корне
+            DotNetEnv.Env.TraversePath().Load();
+            var adminId = Environment.GetEnvironmentVariable("ADMIN_ID");
+            
             Message message = await Client.SendTextMessageAsync(
-            chatId: 985485455,
+            chatId: adminId,
             text: "Бот запущен!");
         }
         static Task Error(ITelegramBotClient arg1, Exception arg2, CancellationToken arg3)
@@ -40,7 +45,7 @@ namespace Insight_bott.Jobs
         {
             var message = update.Message;
             var currentUserTgId = message.Chat.Id;
-            var listOfCommands = new List<string>() { "/start", "здорова", "/get_thought", "/add_new_insight"};
+            var listOfCommands = new List<string>() { "/start", "/get_insight", "/add_new_insight"};
             
             if (message.Text != null)
             {
@@ -48,54 +53,43 @@ namespace Insight_bott.Jobs
 
                 if (listOfCommands.Contains(message.Text))
                 {
-                    if (message.Text.ToLower() == "/start")
+                    switch (message.Text.ToLower())
                     {
-                        AnswersMethods.Start(botClient, message, currentUserTgId, token);
-                    }
-                
-                    else if (message.Text.ToLower().Contains("здорова"))
-                    {
-                        AnswersMethods.Zdorova(botClient, message);
-                    }
-                
-                    else if (message.Text.ToLower() == "/get_thought")
-                    {
-                        AnswersMethods.GetInsight(Client, botClient, message, currentUserTgId, token);
-                    }
-                    
-                    else if (message.Text.ToLower() == "/add_new_insight")
-                    {
-                        await using (ApplicationContext db = new ApplicationContext())
-                        {
-                            Users.GetUser(currentUserTgId, in token, in db, out User currentUserFromDb); //юзер который запросил мысль
-                            currentUserFromDb.WantToAddAnInsight = true;
-                            await db.SaveChangesAsync(token); // сохранение 
-                            await botClient.SendTextMessageAsync(message.Chat.Id, "Введите текст инсайта");
-                        }
+                        case "/start":
+                            AnswersMethods.Start(botClient, message, currentUserTgId, token);
+                            break;
+                        case "/get_insight":
+                            AnswersMethods.GetInsight(botClient, message, currentUserTgId, token);
+                            break;
+                        case "/add_new_insight":
+                            await using (ApplicationContext db = new ApplicationContext())
+                            {
+                                var currentUserFromDb = db.Users.Find(currentUserTgId); //юзер который запросил мысль
+                                currentUserFromDb.WantToAddAnInsight = true;
+                                await db.SaveChangesAsync(token); // сохранение 
+                                await botClient.SendTextMessageAsync(message.Chat.Id, "Введите текст инсайта");
+                            }
+
+                            break;
                     }
                 }
                 else
                 {
                     await using (ApplicationContext db = new ApplicationContext())
                     {
-                        Users.GetUser(currentUserTgId, in token, in db, out User currentUserFromDb); //юзер который запросил мысль
-                        
+                        var currentUserFromDb = db.Users.Find(currentUserTgId);; //юзер который запросил мысль
+                
                         if (currentUserFromDb.WantToAddAnInsight)
                         {
                             currentUserFromDb.AddNewInsight(message.Text);
                             await db.SaveChangesAsync(); // сохранение 
                         }
-                        
                         await botClient.SendTextMessageAsync(message.Chat.Id, "Инсайт сохранен");
-
                     }
-
-
                 }
-
             }
         }
     }
-
-
 }
+
+    
