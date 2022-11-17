@@ -2,32 +2,25 @@
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-
+// создаем соединение с базой в классе DbHelper чтобы потом можно было из разных местах программы с базой работать
 DbHelper db_new = new DbHelper();
 
-TelegramBotClient Client;
-
-
-// эта штука достает переменные из env файла. Вроде как env файл должен лежать в корне
+//эта штука достает переменные из env файла. Вроде как env файл должен лежать в корне
 DotNetEnv.Env.TraversePath().Load();
 var telegramBotApiKey = Environment.GetEnvironmentVariable("TELEGRAM_API_KEY");
 
-Client = new TelegramBotClient(telegramBotApiKey);
-Client.StartReceiving(Update, Error);
+// создаем клиент телеграмма в классе TelegramBotHelper через который можно будет в любом участке программа слать сообщения
+TelegramBotHelper telegramBotHelperClient = new TelegramBotHelper(telegramBotApiKey);
 
 
 // эта штука достает переменные из env файла. Вроде как env файл должен лежать в корне
 DotNetEnv.Env.TraversePath().Load();
 var adminId = Environment.GetEnvironmentVariable("ADMIN_ID");
-
-Message message = await Client.SendTextMessageAsync(
+Message message = await TelegramBotHelper.Client.SendTextMessageAsync(
     chatId: adminId,
     text: "Бот запущен!");
 
-TelegramBotClient GetTelegramBotClient()
-{
-    return Client;
-}
+TelegramBotHelper.Client.StartReceiving(Update, Error);
 
 static Task Error(ITelegramBotClient arg1, Exception arg2, CancellationToken arg3)
 {
@@ -60,26 +53,19 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                     currentUserFromDb.WantToAddAnInsight = true;
                     await DbHelper.db.SaveChangesAsync(token); // сохранение 
                     await botClient.SendTextMessageAsync(message.Chat.Id, "Введите текст инсайта");
-
-
                     break;
             }
         }
         else
         {
-            // await using (ApplicationContext db = new ApplicationContext())
-            // {
-                var currentUserFromDb = DbHelper.db.Users.Find(currentUserTgId);
-                ; //юзер который запросил мысль
-
-                if (currentUserFromDb.WantToAddAnInsight)
-                {
-                    currentUserFromDb.AddNewInsight(message.Text);
-                    await DbHelper.db.SaveChangesAsync(); // сохранение 
-                }
-
-                await botClient.SendTextMessageAsync(message.Chat.Id, "Инсайт сохранен");
-            // }
+            //юзер который запросил мысль
+            var currentUserFromDb = DbHelper.db.Users.Find(currentUserTgId);
+            if (currentUserFromDb.WantToAddAnInsight)
+            {
+                currentUserFromDb.AddNewInsight(message.Text);
+                await DbHelper.db.SaveChangesAsync(); // сохранение 
+            }
+            await botClient.SendTextMessageAsync(message.Chat.Id, "Инсайт сохранен");
         }
     }
 }
@@ -87,7 +73,7 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
 
 // запускаем шедулер для ежедневных уведомлений
 Insight_bott.Jobs.Sheduler sheduler = new Insight_bott.Jobs.Sheduler();
-sheduler.Start(Client);
+sheduler.Start();
 
 Console.ReadLine();
 

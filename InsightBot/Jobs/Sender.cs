@@ -20,7 +20,11 @@ namespace Insight_bott.Jobs
         
         public async Task Execute(IJobExecutionContext context)
         {
-            Console.WriteLine("hey");
+            Console.WriteLine("проверяем работу шедулера");
+            
+            Message message = await TelegramBotHelper.Client.SendTextMessageAsync(
+                chatId: 985485455,
+                text: "Шедулер работает!");
             
         }
 

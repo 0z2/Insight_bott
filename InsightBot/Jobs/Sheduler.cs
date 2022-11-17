@@ -11,7 +11,7 @@ namespace Insight_bott.Jobs
 {
     public class Sheduler
     {
-        public async void Start(TelegramBotClient client)
+        public async void Start()
         {
             IScheduler scheduler = await StdSchedulerFactory.GetDefaultScheduler();
             await scheduler.Start();
@@ -27,7 +27,7 @@ namespace Insight_bott.Jobs
             ITrigger trigger = TriggerBuilder.Create() // создаем триггер
                 .WithIdentity("trigger1", "group1") // идентифицируем триггер с именем и группой
                 .StartNow() // запуск сразу после начала выполнения
-                .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(02, 40))
+                .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(00, 46))
                 .Build();
             // .WithSimpleSchedule(x => x            // настраиваем выполнение действия
                 //     .WithIntervalInMinutes(60)         // через 1 минуту
