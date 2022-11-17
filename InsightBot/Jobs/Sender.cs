@@ -1,13 +1,7 @@
 ﻿using Quartz;
-using System.Net;
-using System.Net.Mail;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using System.Data.Entity;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using EntityState = Microsoft.EntityFrameworkCore.EntityState;
+
 
 namespace Insight_bott.Jobs
 {
@@ -20,14 +14,10 @@ namespace Insight_bott.Jobs
         
         public async Task Execute(IJobExecutionContext context)
         {
-            Console.WriteLine("проверяем работу шедулера");
-            
             Message message = await TelegramBotHelper.Client.SendTextMessageAsync(
-                chatId: 985485455,
-                text: "Шедулер работает!");
-            
+                chatId: 985485455, // скрыть админский id
+                text: "Ежедневная отправка инсайтов пользователям!");
         }
-
     }
 }
 
