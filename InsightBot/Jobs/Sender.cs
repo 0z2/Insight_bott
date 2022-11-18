@@ -27,7 +27,7 @@ namespace Insight_bott.Jobs
                 Console.WriteLine($"Отправляем ежедневный инсайт пользователю {user.TelegramId}");
                 
                 // получаем последний инсайт пользователя
-                user.GetCurrentThought(out string textOfCurrentUserInsight);
+                user.GetCurrentThought(out string textOfCurrentUserInsight, out int idInsightInDb);
                 await TelegramBotHelper.Client.SendTextMessageAsync(
                     chatId: user.TelegramId, // скрыть админский id
                     text: textOfCurrentUserInsight);

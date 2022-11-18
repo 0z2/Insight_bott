@@ -25,7 +25,7 @@ namespace Insight_bott
             NumberOfLastThought = 0;
         }
 
-        public void GetCurrentThought(out string textOfCurrentInsight)
+        public void GetCurrentThought(out string textOfCurrentInsight, out int idInsightInDb)
         {
             {
                 Insight currentInsight = Insights[NumberOfLastThought];
@@ -40,6 +40,7 @@ namespace Insight_bott
                 }
                 
                 textOfCurrentInsight = currentInsight.TextOfInsight;
+                idInsightInDb = currentInsight.Id;
             }
             
         }
