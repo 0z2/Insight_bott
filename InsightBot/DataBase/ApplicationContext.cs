@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore.Diagnostics;
-
 namespace Insight_bott;
 using Microsoft.EntityFrameworkCore;
 

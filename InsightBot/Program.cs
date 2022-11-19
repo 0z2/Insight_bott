@@ -47,7 +47,7 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                     AnswersMethods.Start(botClient, message, currentUserTgId, token);
                     break;
                 case "/get_insight":
-                    AnswersMethods.GetInsight(botClient, message, currentUserTgId, token);
+                    AnswersMethods.GetInsight(botClient, message, currentUserTgId);
                     break;
                 case "/add_new_insight":
 

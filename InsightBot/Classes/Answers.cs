@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -51,8 +50,7 @@ public static class AnswersMethods
     public static async void GetInsight(
         ITelegramBotClient сlient,
         Message message,
-        long currentUserTgId,
-        CancellationToken token)
+        long currentUserTgId)
     {
         // тут можно переписать чтобы сразу корректно подтягивались данные
         var currentUserFromDb = DbHelper.db.Users.Find(currentUserTgId); //юзер который запросил мысль
@@ -78,6 +76,6 @@ public static class AnswersMethods
         await сlient.SendTextMessageAsync(message.Chat.Id, textOfCurrentUserInsight, replyMarkup: inline);
         
         // сохранение для изменения номера последней мысли
-        await DbHelper.db.SaveChangesAsync(token); 
+        await DbHelper.db.SaveChangesAsync(); 
     }
 }

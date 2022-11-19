@@ -1,5 +1,4 @@
-﻿using System.Data.Entity;
-using Quartz;
+﻿using Quartz;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -21,17 +20,15 @@ namespace Insight_bott.Jobs
             
             // тут можно переписать чтобы сразу корректно подтягивались данные
             var currentUsersFromDb = DbHelper.db.Users.ToList(); //юзер который запросил мысль
-            DbHelper.db.Insights.ToList();
+            DbHelper.db.Insights.ToList(); // это чтобы подтянулись в контекст инсайты пользователей
+            
+            // рассылаем инсайты пользователям
             foreach (User user in currentUsersFromDb)
             {
-                Console.WriteLine($"Отправляем ежедневный инсайт пользователю {user.TelegramId}");
-                
-                // получаем последний инсайт пользователя
-                user.GetCurrentThought(out string textOfCurrentUserInsight, out int idInsightInDb);
-                await TelegramBotHelper.Client.SendTextMessageAsync(
-                    chatId: user.TelegramId, // скрыть админский id
-                    text: textOfCurrentUserInsight);
+                AnswersMethods.GetInsight(TelegramBotHelper.Client, message, user.TelegramId);
             }
+            // сохраняем чтобы изменился последний инсайт пользователя
+            DbHelper.db.SaveChangesAsync();
         }
     }
 }
