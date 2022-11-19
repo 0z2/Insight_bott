@@ -25,10 +25,23 @@ namespace Insight_bott.Jobs
             // рассылаем инсайты пользователям
             foreach (User user in currentUsersFromDb)
             {
-                AnswersMethods.GetInsight(TelegramBotHelper.Client, message, user.TelegramId);
+                try
+                {
+                    user.GetCurrentThought(out string textOfCurrentInsight, out int idInsightInDb);
+                    AnswersMethods.SendInsight(textOfCurrentInsight, idInsightInDb, user.TelegramId);                   
+                }
+                catch(ArgumentOutOfRangeException)
+                {
+                    // если у пользователя нет ни одного инсайта
+                    await TelegramBotHelper.Client.SendTextMessageAsync(
+                        user.TelegramId,
+                        "У вас не сохранено ни одного инсайта.\n" +
+                        "Для добавления нового инасайте нажмите на /add_new_insight " +
+                        "и затем напишите текст инсайта.");
+                }
+                //сохраняем чтобы изменился последний инсайт пользователя
+                //DbHelper.db.SaveChangesAsync();
             }
-            // сохраняем чтобы изменился последний инсайт пользователя
-            DbHelper.db.SaveChangesAsync();
         }
     }
 }

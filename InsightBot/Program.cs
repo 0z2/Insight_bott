@@ -47,8 +47,23 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                     AnswersMethods.Start(botClient, message, currentUserTgId, token);
                     break;
                 case "/get_insight":
-                    AnswersMethods.GetInsight(botClient, message, currentUserTgId);
-                    break;
+
+                    try
+                    {
+                        AnswersMethods.GetInsight(currentUserTgId, out string textOfInsight,
+                            out int idOfUserInsightInDb);
+                        AnswersMethods.SendInsight(textOfInsight, idOfUserInsightInDb, currentUserTgId);
+                    }
+                    catch (Exception)
+                    {
+                        botClient.SendTextMessageAsync(
+                            chatId: currentUserTgId,
+                            text: $"Список инсайтов пуст. Добавьте новый инсайт /add_new_insight");
+                    }
+                    
+                
+
+                        break;
                 case "/add_new_insight":
 
                     var currentUserFromDb = DbHelper.db.Users.Find(currentUserTgId); //юзер который запросил мысль

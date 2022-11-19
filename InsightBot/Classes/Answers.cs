@@ -47,35 +47,36 @@ public static class AnswersMethods
         }
     }
 
-    public static async void GetInsight(
-        ITelegramBotClient сlient,
-        Message message,
-        long currentUserTgId)
+    public static void GetInsight(
+        long currentUserTgId,
+        out string textOfInsight,
+        out int idOfUserInsightInDb
+        )
     {
         // тут можно переписать чтобы сразу корректно подтягивались данные
         var currentUserFromDb = DbHelper.db.Users.Find(currentUserTgId); //юзер который запросил мысль
         DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
-        if (currentUserFromDb ==
-            null) // заплатка на случай если пользователя нет в списке пользователей, но он отправил сообщение
-        {
-            await сlient.SendTextMessageAsync(
-                chatId: 985485455,
-                text: $"Пользователь которого нет в базе запросил мыcль. tgId пользователя: {currentUserTgId}");
-        }
-        
+
         // получаем последний инсайт
-        currentUserFromDb.GetCurrentThought(out string textOfCurrentUserInsight, out int idInsightInDb);
+        currentUserFromDb.GetCurrentThought(out string textOfCurrentUserInsight, out int idOfCurrentUserInsightInDb);
         
-        // создаем инлайн кнопку для удаления инсайта
-        InlineKeyboardButton deleteButton = new InlineKeyboardButton("Удалить");
-        deleteButton.Text = "Удалить";
-        deleteButton.CallbackData = Convert.ToString(idInsightInDb);
-        InlineKeyboardMarkup inline = new InlineKeyboardMarkup(deleteButton);
+        // возвращаем
+        textOfInsight = textOfCurrentUserInsight;
+        idOfUserInsightInDb = idOfCurrentUserInsightInDb;
+    }
+
+    public static async void SendInsight(
+        string textOfCurrentUserInsight,
+        int idInsightInDb,
+        long currentUserTgId)
+    {
+             // создаем инлайн кнопку для удаления инсайта
+            InlineKeyboardButton deleteButton = new InlineKeyboardButton("Удалить");
+            deleteButton.Text = "Удалить";
+            deleteButton.CallbackData = Convert.ToString(idInsightInDb);
+            InlineKeyboardMarkup inline = new InlineKeyboardMarkup(deleteButton);
         
-        // отправляем текст инсайта с инлайн кнопкой удаления
-        await сlient.SendTextMessageAsync(message.Chat.Id, textOfCurrentUserInsight, replyMarkup: inline);
-        
-        // сохранение для изменения номера последней мысли
-        await DbHelper.db.SaveChangesAsync(); 
+            // отправляем текст инсайта с инлайн кнопкой удаления
+            await TelegramBotHelper.Client.SendTextMessageAsync(currentUserTgId, textOfCurrentUserInsight, replyMarkup: inline);
     }
 }

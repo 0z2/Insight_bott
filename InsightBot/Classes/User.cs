@@ -36,6 +36,7 @@ namespace Insight_bott
                 
                 textOfCurrentInsight = currentInsight.TextOfInsight;
                 idInsightInDb = currentInsight.Id;
+                DbHelper.db.SaveChangesAsync();
             }
             
         }
