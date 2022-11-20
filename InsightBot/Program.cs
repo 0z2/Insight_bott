@@ -36,7 +36,7 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
     {
         Console.WriteLine($" {message.Chat.Id} сделал запрос.");
         
-        var listOfCommands = new List<string>() { "/start", "/get_insight", "/add_new_insight" };
+        var listOfCommands = new List<string>() { "/start", "/get_insight", "/add_new_insight", "/help" };
         long currentUserTgId = message.Chat.Id;
 
         if (listOfCommands.Contains(message.Text))
@@ -60,16 +60,18 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                             chatId: currentUserTgId,
                             text: $"Список инсайтов пуст. Добавьте новый инсайт /add_new_insight");
                     }
-                    
-                
-
-                        break;
+                    break;
                 case "/add_new_insight":
-
                     var currentUserFromDb = DbHelper.db.Users.Find(currentUserTgId); //юзер который запросил мысль
                     currentUserFromDb.WantToAddAnInsight = true;
                     await DbHelper.db.SaveChangesAsync(token); // сохранение 
                     await botClient.SendTextMessageAsync(message.Chat.Id, "Введите текст инсайта");
+                    break;
+                case "/help":
+                    await botClient.SendTextMessageAsync(
+                        message.Chat.Id, "В этом боте вы можете сохранять значимые для себя мысли. " +
+                                         "Каждое утро бот будет присылать по одной из них.\n" +
+                                         "Для добавления мысли нажмите /add_new_insight");
                     break;
             }
         }
