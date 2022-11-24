@@ -27,7 +27,7 @@ namespace Insight_bott.Jobs
             {
                 try
                 {
-                    user.GetCurrentThought(out string textOfCurrentInsight, out int idInsightInDb);
+                    user.GetCurrentInsight(out string textOfCurrentInsight, out int idInsightInDb);
                     AnswersMethods.SendInsight(textOfCurrentInsight, idInsightInDb, user.TelegramId);                   
                 }
                 catch(ArgumentOutOfRangeException)

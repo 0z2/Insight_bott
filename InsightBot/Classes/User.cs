@@ -20,7 +20,7 @@ namespace Insight_bott
             NumberOfLastThought = 0;
         }
 
-        public void GetCurrentThought(out string textOfCurrentInsight, out int idInsightInDb)
+        public void GetCurrentInsight(out string textOfCurrentInsight, out int idInsightInDb)
         {
             {
                 Insight currentInsight = Insights[NumberOfLastThought];
@@ -39,6 +39,15 @@ namespace Insight_bott
                 DbHelper.db.SaveChangesAsync();
             }
             
+        }
+
+        public void GetRandomInsight(out string textOfRandomInsight, out int idRandomInsight)
+        {
+            Random rnd = new Random();
+            int amountOfInsights = Insights.Count();
+            int randomNumber  = rnd.Next(0, amountOfInsights-1);
+            textOfRandomInsight = Insights[randomNumber].TextOfInsight;
+            idRandomInsight = Insights[randomNumber].Id;
         }
 
         public void AddNewInsight(string textOfInsight)

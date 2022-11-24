@@ -36,7 +36,7 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
     {
         Console.WriteLine($" {message.Chat.Id} сделал запрос.");
         
-        var listOfCommands = new List<string>() { "/start", "/get_insight", "/add_new_insight", "/help" };
+        var listOfCommands = new List<string>() { "/start", "/get_insight", "/add_new_insight", "/help", "/random_insight" };
         long currentUserTgId = message.Chat.Id;
 
         if (listOfCommands.Contains(message.Text))
@@ -47,11 +47,9 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                     AnswersMethods.Start(botClient, message, currentUserTgId, token);
                     break;
                 case "/get_insight":
-
                     try
                     {
-                        AnswersMethods.GetInsight(currentUserTgId, out string textOfInsight,
-                            out int idOfUserInsightInDb);
+                        AnswersMethods.GetInsight(currentUserTgId, out string textOfInsight, out int idOfUserInsightInDb);
                         AnswersMethods.SendInsight(textOfInsight, idOfUserInsightInDb, currentUserTgId);
                     }
                     catch (Exception)
@@ -60,6 +58,13 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                             chatId: currentUserTgId,
                             text: $"Список инсайтов пуст. Добавьте новый инсайт /add_new_insight");
                     }
+                    break;
+                case "/random_insight":
+                    // тут можно переписать чтобы сразу корректно подтягивались данные
+                    var UserFromDb = DbHelper.db.Users.Find(currentUserTgId); //юзер который запросил мысль
+                    DbHelper.db.Entry(UserFromDb).Collection(c => c.Insights).Load();
+                    UserFromDb.GetRandomInsight(out string textOfRandomInsight, out int idRandomInsight);
+                    AnswersMethods.SendInsight(textOfRandomInsight, idRandomInsight, currentUserTgId);
                     break;
                 case "/add_new_insight":
                     var currentUserFromDb = DbHelper.db.Users.Find(currentUserTgId); //юзер который запросил мысль

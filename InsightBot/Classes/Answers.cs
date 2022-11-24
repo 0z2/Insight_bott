@@ -50,7 +50,6 @@ public static class AnswersMethods
             await DbHelper.db.SaveChangesAsync(token); // разобраться что это за токен такой и для чего он нужен
         }
     }
-
     public static void GetInsight(
         long currentUserTgId,
         out string textOfInsight,
@@ -62,7 +61,7 @@ public static class AnswersMethods
         DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
 
         // получаем последний инсайт
-        currentUserFromDb.GetCurrentThought(out string textOfCurrentUserInsight, out int idOfCurrentUserInsightInDb);
+        currentUserFromDb.GetCurrentInsight(out string textOfCurrentUserInsight, out int idOfCurrentUserInsightInDb);
         
         // возвращаем
         textOfInsight = textOfCurrentUserInsight;
