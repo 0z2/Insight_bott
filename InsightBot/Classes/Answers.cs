@@ -15,7 +15,6 @@ public static class AnswersMethods
         var isAlreadyInBase = false;
 
         // работаем с пользователем нажавшим start
-
         // пытаемся найти пользователя
         var user = DbHelper.db.Users.Find(currentUserTgId);
 
@@ -67,7 +66,7 @@ public static class AnswersMethods
         textOfInsight = textOfCurrentUserInsight;
         idOfUserInsightInDb = idOfCurrentUserInsightInDb;
     }
-
+    
     public static async void SendInsight(
         string textOfCurrentUserInsight,
         int idInsightInDb,

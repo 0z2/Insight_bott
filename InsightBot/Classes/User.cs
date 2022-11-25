@@ -23,22 +23,19 @@ namespace Insight_bott
         public void GetCurrentInsight(out string textOfCurrentInsight, out int idInsightInDb)
         {
             {
-                Insight currentInsight = Insights[NumberOfLastThought];
-
-                if (Insights.Count-1 == NumberOfLastThought)
+                var numberOfLastInsightInList = Insights.Count - 1;
+                if (NumberOfLastThought > numberOfLastInsightInList)
                 {
                     NumberOfLastThought = 0;
                 }
-                else 
-                {
-                    NumberOfLastThought++;
-                }
+
+                Insight currentInsight = Insights[NumberOfLastThought];
+                NumberOfLastThought++;
                 
                 textOfCurrentInsight = currentInsight.TextOfInsight;
                 idInsightInDb = currentInsight.Id;
                 DbHelper.db.SaveChangesAsync();
             }
-            
         }
 
         public void GetRandomInsight(out string textOfRandomInsight, out int idRandomInsight)
@@ -54,6 +51,29 @@ namespace Insight_bott
         {
             var newInsight = new Insight(textOfInsight);
             Insights.Add(newInsight);
+        }
+
+        public void DeleteInsight(int insightIdNeedToDelete, out bool isDelited)
+        {
+            var numberOfDelitedInsightInList = 0;
+            isDelited = false;
+            // находим инсайт, который нужно удалить и удаляем
+            foreach (Insight insight in Insights)
+            {
+                if (insight.Id == insightIdNeedToDelete)
+                {
+                    // если удаляемый элемент находится раньше текущего инсайта в очереди, сдвигаем влево для сохранения порядка
+                    if (numberOfDelitedInsightInList < NumberOfLastThought && NumberOfLastThought != 0)
+                    {
+                        NumberOfLastThought--;
+                    }
+                    Insights.RemoveAt(numberOfDelitedInsightInList);
+                    
+                    isDelited = true;
+                    break;
+                }
+                numberOfDelitedInsightInList++;
+            }
         }
     }
 }

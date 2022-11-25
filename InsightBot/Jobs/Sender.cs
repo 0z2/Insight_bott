@@ -14,8 +14,10 @@ namespace Insight_bott.Jobs
         
         public async Task Execute(IJobExecutionContext context)
         {
-            Message message = await TelegramBotHelper.Client.SendTextMessageAsync(
-                chatId: 985485455, // скрыть админский id
+            DotNetEnv.Env.TraversePath().Load();
+            var adminId = Environment.GetEnvironmentVariable("ADMIN_ID");
+            await TelegramBotHelper.Client.SendTextMessageAsync(
+                chatId: adminId, // скрыть админский id
                 text: "Ежедневная отправка инсайтов пользователям!");
             
             // тут можно переписать чтобы сразу корректно подтягивались данные
@@ -39,8 +41,6 @@ namespace Insight_bott.Jobs
                         "Для добавления нового инасайте нажмите на /add_new_insight " +
                         "и затем напишите текст инсайта.");
                 }
-                //сохраняем чтобы изменился последний инсайт пользователя
-                //DbHelper.db.SaveChangesAsync();
             }
         }
     }
