@@ -1,9 +1,19 @@
 ﻿using Insight_bott;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Insight_bott.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 // создаем соединение с базой в классе DbHelper чтобы потом можно было из разных местах программы с базой работать
 DbHelper db_new = new DbHelper();
+
+// создаем сервис логирования
+
+ 
+IServiceCollection services = new ServiceCollection()
+    .AddSingleton<ILogService, SimpleLogService>();
+using ServiceProvider serviceProvider = services.BuildServiceProvider();
+var logger = serviceProvider.GetService<ILogService>();
 
 
 //эта штука достает переменные из env файла. Вроде как env файл должен лежать в корне
@@ -32,7 +42,18 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
 
     if (message != null)
     {
-        Console.WriteLine($" {message.Chat.Id} сделал запрос {message.Text}.");
+        // вариант логгирования просто через интерфейс. Здесь каждый раз независимый объет создается
+        // //Console.WriteLine($" {message.Chat.Id} сделал запрос {message.Text}.");
+        // var logger = new Logger(new SimpleLogService());
+        // //logger.Log($" {message.Chat.Id} сделал запрос {message.Text}.");
+        //  
+        // logger = new Logger(new GreenLogService());
+        // logger.Log($" {message.Chat.Id} сделал запрос {message.Text}.");
+        
+        
+        // логируем запрос
+        logger.Write($"Юзер {message.Chat.Username} c id {message.Chat.Id} сделал запрос: {message.Text}.");
+        
         
         var listOfCommands = new List<string>() { "/start", "/get_insight", "/add_new_insight", "/help", "/random_insight" };
         long currentUserTgId = message.Chat.Id;
@@ -122,8 +143,6 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
         {
             await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт уже был удален ранее");
         }
-        
-
 
         // старая логику удаления инсайтов. Не подошла потому что очередность иснайтов сбивалась
         // из за того что не редактировалась переменная currentThought в юзере
