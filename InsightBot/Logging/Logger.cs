@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Insight_bott.Logging;
 
 // https://metanit.com/sharp/dotnet/1.3.php тут подробнее о том как работает
@@ -7,7 +9,8 @@ namespace Insight_bott.Logging;
  
 //logger = new Logger(new GreenLogService());
 //ogger.Log("Hello METANIT.COM");
- 
+
+
 interface ILogService
 {
     void Write(string message);
@@ -16,9 +19,27 @@ interface ILogService
 class SimpleLogService : ILogService
 {
     // пишем лог в консоль
-    public void Write(string message) => Console.WriteLine($"{DateTime.Now} {message}");
-    
-    
+    public void Write(string message)
+    {
+        // строка для записи
+        string text = $"{DateTime.Now} {message}\n"; 
+        
+        //пишем в консоль
+        Console.Write(text);
+        
+        # region [ WriteToFile ]
+        string path = "/Users/betehtin/Yandex.Disk.localized/Программирование/C#/repos/Insight_bott/logs.txt";   // путь к файлу
+        // запись в файл
+        using (FileStream fstream = new FileStream(path, FileMode.Append))
+        {
+            // преобразуем строку в байты
+            byte[] buffer = Encoding.Default.GetBytes(text);
+            // запись массива байтов в файл
+            fstream.WriteAsync(buffer, 0, buffer.Length);
+            //Console.WriteLine("Текст записан в файл");
+        }
+        # endregion
+    }
 }
 // сервис, который выводит сообщение зеленым цветом
 class GreenLogService : ILogService
@@ -38,3 +59,4 @@ class Logger
     public Logger(ILogService logService) => this.logService = logService;
     public void Log(string message) =>logService.Write($"{DateTime.Now}  {message}");
 }
+
