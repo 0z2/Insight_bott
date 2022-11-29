@@ -8,8 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 DbHelper db_new = new DbHelper();
 
 // создаем сервис логирования
-
- 
 IServiceCollection services = new ServiceCollection()
     .AddSingleton<ILogService, SimpleLogService>();
 using ServiceProvider serviceProvider = services.BuildServiceProvider();
@@ -122,49 +120,133 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
     // если событие является колбэком
     else if (update.CallbackQuery != null)
     {
-        // получаем userTelegramId пользователя, запросившего удаление
-        var userTelegramId = update.CallbackQuery.From.Id;
-        // извлекаем номер инсайта, который необходимо удалить
-        var idInsightForDeleting = Convert.ToInt32(update.CallbackQuery.Data);
-        
-        //юзер который отправил инсайт
-        var currentUserFromDb = DbHelper.db.Users.Find(userTelegramId);
-        // добавляем в контекст DB инсайты пользователя
-        DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
-        
-        currentUserFromDb.DeleteInsight(idInsightForDeleting, out bool isDelited);
-
-        if (isDelited)
+        string[] dataFromButton = update.CallbackQuery.Data.Split(",");
+        string idOfInsight = dataFromButton[0];
+        string textOfButton = dataFromButton[1];
+        if (textOfButton == "Удалить")
         {
-            await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт удален");
-            DbHelper.db.SaveChangesAsync();
-        }
-        else
-        {
-            await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт уже был удален ранее");
-        }
-
-        // старая логику удаления инсайтов. Не подошла потому что очередность иснайтов сбивалась
-        // из за того что не редактировалась переменная currentThought в юзере
+            // получаем userTelegramId пользователя, запросившего удаление
+            var userTelegramId = update.CallbackQuery.From.Id;
+            // извлекаем номер инсайта, который необходимо удалить
+            var idInsightForDeleting = Convert.ToInt32(idOfInsight);
         
-        // // получаем объект инсайта, который нужно удалить. Наверное можно прямо тут и удалять, но пока не знаю как
-        // var insightForDeliting = (from Insight in DbHelper.db.Insights
-        //     where Insight.UserTelegramId == userTelegramId && Insight.Id == idInsightForDeleting
-        //     select Insight).ToList();
-        //
-        // // если пост для удаления нашли, то удаляем
-        // if (insightForDeliting.Count != 0)
-        // {
-        //     // удаляем инсайт и сохраняем изменения
-        //     DbHelper.db.Insights.Remove(insightForDeliting[0]);
-        //     DbHelper.db.SaveChangesAsync();
-        //
-        //     await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт удален");
-        // }
-        // else
-        // {
-        //     await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт уже был удален ранее");
-        // }
+            //юзер который отправил инсайт
+            var currentUserFromDb = DbHelper.db.Users.Find(userTelegramId);
+            // добавляем в контекст DB инсайты пользователя
+            DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
+        
+            currentUserFromDb.DeleteInsight(idInsightForDeleting, out bool isDelited);
+
+            if (isDelited)
+            {
+                await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт удален");
+                await DbHelper.db.SaveChangesAsync();
+            }
+            else
+            {
+                await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт уже был удален ранее");
+            }
+        }
+        else if (textOfButton == "Повторить завтра")
+        {
+            // ЕСТЬ ПОВТОРЕНИЕ ЭТОГО КОДА, ВЫНЕСТИ В ОТДЕЛЬНЫЙ МЕТОД
+            // получаем userTelegramId пользователя, запросившего удаление
+            var userTelegramId = update.CallbackQuery.From.Id;
+            // извлекаем номер инсайта, который необходимо удалить
+            var idInsightForRepiting= Convert.ToInt32(idOfInsight);
+            //юзер который отправил инсайт
+            var currentUserFromDb = DbHelper.db.Users.Find(userTelegramId);
+            // добавляем в контекст DB инсайты пользователя
+            DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
+            
+            bool wasFound = false;
+            foreach (Insight insight in currentUserFromDb.Insights)
+            {
+                
+                if (insight.Id == idInsightForRepiting)
+                {
+                    insight.CreateRepeat(1);
+                    await DbHelper.db.SaveChangesAsync();
+                    wasFound = true;
+                    
+                    
+                    await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Повторю завтра");
+
+                    break;
+                }
+            }
+            if (wasFound != true)
+            {
+                await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт не найден");
+            }
+            
+        }
+        else if (textOfButton == "Повторить через день")
+        {
+            // ЕСТЬ ПОВТОРЕНИЕ ЭТОГО КОДА, ВЫНЕСТИ В ОТДЕЛЬНЫЙ МЕТОД
+            // получаем userTelegramId пользователя, запросившего удаление
+            var userTelegramId = update.CallbackQuery.From.Id;
+            // извлекаем номер инсайта, который необходимо удалить
+            var idInsightForRepiting= Convert.ToInt32(idOfInsight);
+            //юзер который отправил инсайт
+            var currentUserFromDb = DbHelper.db.Users.Find(userTelegramId);
+            // добавляем в контекст DB инсайты пользователя
+            DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
+            
+            bool wasFound = false;
+            foreach (Insight insight in currentUserFromDb.Insights)
+            {
+                
+                if (insight.Id == idInsightForRepiting)
+                {
+                    insight.CreateRepeat(2);
+                    await DbHelper.db.SaveChangesAsync();
+                    wasFound = true;
+                    
+                    
+                    await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Повторю через день");
+
+                    break;
+                }
+            }
+            if (wasFound != true)
+            {
+                await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт не найден");
+            }
+        }
+        else if (textOfButton == "Повторить через неделю")
+        {
+            // ЕСТЬ ПОВТОРЕНИЕ ЭТОГО КОДА, ВЫНЕСТИ В ОТДЕЛЬНЫЙ МЕТОД
+            // получаем userTelegramId пользователя, запросившего удаление
+            var userTelegramId = update.CallbackQuery.From.Id;
+            // извлекаем номер инсайта, который необходимо удалить
+            var idInsightForRepiting= Convert.ToInt32(idOfInsight);
+            //юзер который отправил инсайт
+            var currentUserFromDb = DbHelper.db.Users.Find(userTelegramId);
+            // добавляем в контекст DB инсайты пользователя
+            DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
+            
+            bool wasFound = false;
+            foreach (Insight insight in currentUserFromDb.Insights)
+            {
+                
+                if (insight.Id == idInsightForRepiting)
+                {
+                    insight.CreateRepeat(7);
+                    await DbHelper.db.SaveChangesAsync();
+                    wasFound = true;
+                    
+                    
+                    await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Повторю через неделю");
+
+                    break;
+                }
+            }
+            if (wasFound != true)
+            {
+                await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт не найден");
+            }
+        }
 
     }
     else

@@ -27,7 +27,7 @@ class SimpleLogService : ILogService
         //пишем в консоль
         Console.Write(text);
         
-        # region [ WriteToFile ]
+        # region [ WriteLoggsToFile ]
         string path = "/Users/betehtin/Yandex.Disk.localized/Программирование/C#/repos/Insight_bott/logs.txt";   // путь к файлу
         // запись в файл
         using (FileStream fstream = new FileStream(path, FileMode.Append))

@@ -10,7 +10,10 @@ public class ApplicationContext : DbContext
 
     public ApplicationContext()
     {
-        Database.EnsureCreated();
+        //Database.EnsureCreated();
+        
+        // нужна чтобы timestamp работал (поле даты в классе Insight
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true); 
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

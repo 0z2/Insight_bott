@@ -72,13 +72,38 @@ public static class AnswersMethods
         int idInsightInDb,
         long currentUserTgId)
     {
-             // создаем инлайн кнопку для удаления инсайта
-            InlineKeyboardButton deleteButton = new InlineKeyboardButton("Удалить");
-            deleteButton.Text = "Удалить";
-            deleteButton.CallbackData = Convert.ToString(idInsightInDb);
-            InlineKeyboardMarkup inline = new InlineKeyboardMarkup(deleteButton);
+            // пример создания инлайн кнопок https://stackoverflow.com/questions/62797191/how-to-add-two-inline-buttons-to-a-telegram-bot-by-c
         
+            // создаем инлайн кнопку для удаления инсайта
+            InlineKeyboardButton deleteButton = new InlineKeyboardButton("Удалить");
+            deleteButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Удалить");
+            
+            // создаем инлайн кнопку для удаления инсайта
+            InlineKeyboardButton repeatTomorrowButton = new InlineKeyboardButton("Повторить завтра");
+            repeatTomorrowButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить завтра";
+
+            // создаем инлайн кнопку для удаления инсайта
+            InlineKeyboardButton repeatInADayButton = new InlineKeyboardButton("Повторить через день");
+            repeatInADayButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить через день";
+            
+            // создаем инлайн кнопку для удаления инсайта
+            InlineKeyboardButton repeatInAWeekButton = new InlineKeyboardButton("Повторить через неделю");
+            repeatInAWeekButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить через неделю";
+
+            InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { repeatTomorrowButton, repeatInADayButton };
+            InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { repeatInAWeekButton};
+            InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { deleteButton };
+            
+            var inlineKeyboard = new InlineKeyboardMarkup(new[]
+            {
+                row1,
+                row2,
+                row3
+            });
+
+
             // отправляем текст инсайта с инлайн кнопкой удаления
-            await TelegramBotHelper.Client.SendTextMessageAsync(currentUserTgId, textOfCurrentUserInsight, replyMarkup: inline);
+            await TelegramBotHelper.Client.SendTextMessageAsync(
+                currentUserTgId, textOfCurrentUserInsight, replyMarkup: inlineKeyboard);
     }
 }
