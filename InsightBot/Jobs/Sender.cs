@@ -24,13 +24,24 @@ namespace Insight_bott.Jobs
             var currentUsersFromDb = DbHelper.db.Users.ToList(); //юзер который запросил мысль
             DbHelper.db.Insights.ToList(); // это чтобы подтянулись в контекст инсайты пользователей
             
-            // рассылаем инсайты пользователям
+            // рассылаем ежедневные инсайты пользователям
             foreach (User user in currentUsersFromDb)
             {
                 try
                 {
+                    // ежедневный инсайт
                     user.GetCurrentInsight(out string textOfCurrentInsight, out int idInsightInDb);
-                    AnswersMethods.SendInsight(textOfCurrentInsight, idInsightInDb, user.TelegramId);                   
+                    AnswersMethods.SendInsight(textOfCurrentInsight, idInsightInDb, user.TelegramId);
+                    
+                    // инсайты с сегодняшней датой повторения
+                    foreach (Insight insight in user.Insights)
+                    {
+                        if (insight.WhenToRepeat == DateTime.Today && insight.Id != idInsightInDb)
+                        {
+                            AnswersMethods.SendInsight(insight.TextOfInsight, insight.Id, user.TelegramId);
+                            insight.WhenToRepeat = null;
+                        }
+                    }
                 }
                 catch(ArgumentOutOfRangeException)
                 {
@@ -42,6 +53,8 @@ namespace Insight_bott.Jobs
                         "и затем напишите текст инсайта.");
                 }
             }
+
+            await DbHelper.db.SaveChangesAsync();
         }
     }
 }
