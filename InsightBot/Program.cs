@@ -28,6 +28,10 @@ Message message = await TelegramBotHelper.Client.SendTextMessageAsync(
     chatId: adminId,
     text: "Бот запущен!");
 
+// запускаем шедулер для ежедневных уведомлений
+Insight_bott.Jobs.Sheduler sheduler = new Insight_bott.Jobs.Sheduler();
+sheduler.Start();
+
 TelegramBotHelper.Client.StartReceiving(Update, Error);
 static Task Error(ITelegramBotClient arg1, Exception arg2, CancellationToken arg3)
 {
@@ -37,21 +41,11 @@ static Task Error(ITelegramBotClient arg1, Exception arg2, CancellationToken arg
 async Task Update(ITelegramBotClient botClient, Update update, CancellationToken token)
 {
     var message = update.Message;
-
+    // если событие является текстом
     if (message != null)
     {
-        // вариант логгирования просто через интерфейс. Здесь каждый раз независимый объет создается
-        // //Console.WriteLine($" {message.Chat.Id} сделал запрос {message.Text}.");
-        // var logger = new Logger(new SimpleLogService());
-        // //logger.Log($" {message.Chat.Id} сделал запрос {message.Text}.");
-        //  
-        // logger = new Logger(new GreenLogService());
-        // logger.Log($" {message.Chat.Id} сделал запрос {message.Text}.");
-        
-        
         // логируем запрос
         logger.Write($"Юзер {message.Chat.Username} c id {message.Chat.Id} сделал запрос: {message.Text}.");
-        
         
         var listOfCommands = new List<string>() { "/start", "/get_insight", "/add_new_insight", "/help", "/random_insight" };
         long currentUserTgId = message.Chat.Id;
@@ -80,6 +74,7 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                     // тут можно переписать чтобы сразу корректно подтягивались данные
                     var UserFromDb = DbHelper.db.Users.Find(currentUserTgId); //юзер который запросил мысль
                     DbHelper.db.Entry(UserFromDb).Collection(c => c.Insights).Load();
+                    
                     UserFromDb.GetRandomInsight(out string textOfRandomInsight, out int idRandomInsight);
                     AnswersMethods.SendInsight(textOfRandomInsight, idRandomInsight, currentUserTgId);
                     break;
@@ -97,15 +92,15 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                     break;
             }
         }
+        // просто пришел какой-то текст
         else
         {
-            //юзер который отправил инсайт
+            //юзер который отправил текст
             var currentUserFromDb = DbHelper.db.Users.Find(currentUserTgId);
+            // если у пользователь ранее отправлял команду /add_new_insight
             if (currentUserFromDb.WantToAddAnInsight)
             {
-                // подтягиваем контекст инсайтов по пользователю
-                //DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
-                
+                // сохраняем новый инсайт в список инсайтов пользователя
                 currentUserFromDb.AddNewInsight(message.Text);
                 var answer = await DbHelper.db.SaveChangesAsync(); // сохранение 
                 await botClient.SendTextMessageAsync(message.Chat.Id, "Инсайт сохранен");
@@ -120,23 +115,23 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
     // если событие является колбэком
     else if (update.CallbackQuery != null)
     {
+        var callbackQueryId = update.CallbackQuery.Id;
+        
+        // получаем id инсайта и информацию о кнопке колбэка
         string[] dataFromButton = update.CallbackQuery.Data.Split(",");
-        string idOfInsight = dataFromButton[0];
+        int idOfInsight = Convert.ToInt32(dataFromButton[0]);
         string textOfButton = dataFromButton[1];
+        
+        // получаем userTelegramId пользователя
+        var userTelegramId = update.CallbackQuery.From.Id;
+        
+        // получаем юзера и его список инсайтов из БД
+        var currentUserFromDb = DbHelper.db.Users.Find(userTelegramId);
+        DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
+        
         if (textOfButton == "Удалить")
         {
-            // получаем userTelegramId пользователя, запросившего удаление
-            var userTelegramId = update.CallbackQuery.From.Id;
-            // извлекаем номер инсайта, который необходимо удалить
-            var idInsightForDeleting = Convert.ToInt32(idOfInsight);
-        
-            //юзер который отправил инсайт
-            var currentUserFromDb = DbHelper.db.Users.Find(userTelegramId);
-            // добавляем в контекст DB инсайты пользователя
-            DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
-        
-            currentUserFromDb.DeleteInsight(idInsightForDeleting, out bool isDelited);
-
+            currentUserFromDb.DeleteInsight(idOfInsight, out bool isDelited);
             if (isDelited)
             {
                 await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт удален");
@@ -148,104 +143,16 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
             }
         }
         else if (textOfButton == "Повторить завтра")
-        {
-            // ЕСТЬ ПОВТОРЕНИЕ ЭТОГО КОДА, ВЫНЕСТИ В ОТДЕЛЬНЫЙ МЕТОД
-            // получаем userTelegramId пользователя, запросившего удаление
-            var userTelegramId = update.CallbackQuery.From.Id;
-            // извлекаем номер инсайта, который необходимо удалить
-            var idInsightForRepiting= Convert.ToInt32(idOfInsight);
-            //юзер который отправил инсайт
-            var currentUserFromDb = DbHelper.db.Users.Find(userTelegramId);
-            // добавляем в контекст DB инсайты пользователя
-            DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
-            
-            bool wasFound = false;
-            foreach (Insight insight in currentUserFromDb.Insights)
-            {
-                
-                if (insight.Id == idInsightForRepiting)
-                {
-                    insight.CreateRepeat(1);
-                    await DbHelper.db.SaveChangesAsync();
-                    wasFound = true;
-                    
-                    
-                    await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Повторю завтра");
-
-                    break;
-                }
-            }
-            if (wasFound != true)
-            {
-                await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт не найден");
-            }
-            
+        {   
+            setRepeat(1, botClient, currentUserFromDb, idOfInsight, callbackQueryId);
         }
         else if (textOfButton == "Повторить через день")
         {
-            // ЕСТЬ ПОВТОРЕНИЕ ЭТОГО КОДА, ВЫНЕСТИ В ОТДЕЛЬНЫЙ МЕТОД
-            // получаем userTelegramId пользователя, запросившего удаление
-            var userTelegramId = update.CallbackQuery.From.Id;
-            // извлекаем номер инсайта, который необходимо удалить
-            var idInsightForRepiting= Convert.ToInt32(idOfInsight);
-            //юзер который отправил инсайт
-            var currentUserFromDb = DbHelper.db.Users.Find(userTelegramId);
-            // добавляем в контекст DB инсайты пользователя
-            DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
-            
-            bool wasFound = false;
-            foreach (Insight insight in currentUserFromDb.Insights)
-            {
-                
-                if (insight.Id == idInsightForRepiting)
-                {
-                    insight.CreateRepeat(2);
-                    await DbHelper.db.SaveChangesAsync();
-                    wasFound = true;
-                    
-                    
-                    await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Повторю через день");
-
-                    break;
-                }
-            }
-            if (wasFound != true)
-            {
-                await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт не найден");
-            }
+            setRepeat(2, botClient, currentUserFromDb, idOfInsight, callbackQueryId);
         }
         else if (textOfButton == "Повторить через неделю")
         {
-            // ЕСТЬ ПОВТОРЕНИЕ ЭТОГО КОДА, ВЫНЕСТИ В ОТДЕЛЬНЫЙ МЕТОД
-            // получаем userTelegramId пользователя, запросившего удаление
-            var userTelegramId = update.CallbackQuery.From.Id;
-            // извлекаем номер инсайта, который необходимо удалить
-            var idInsightForRepiting= Convert.ToInt32(idOfInsight);
-            //юзер который отправил инсайт
-            var currentUserFromDb = DbHelper.db.Users.Find(userTelegramId);
-            // добавляем в контекст DB инсайты пользователя
-            DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
-            
-            bool wasFound = false;
-            foreach (Insight insight in currentUserFromDb.Insights)
-            {
-                
-                if (insight.Id == idInsightForRepiting)
-                {
-                    insight.CreateRepeat(7);
-                    await DbHelper.db.SaveChangesAsync();
-                    wasFound = true;
-                    
-                    
-                    await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Повторю через неделю");
-
-                    break;
-                }
-            }
-            if (wasFound != true)
-            {
-                await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт не найден");
-            }
+            setRepeat(7, botClient, currentUserFromDb, idOfInsight, callbackQueryId);
         }
 
     }
@@ -255,9 +162,35 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
     }
 }
 
-// запускаем шедулер для ежедневных уведомлений
-Insight_bott.Jobs.Sheduler sheduler = new Insight_bott.Jobs.Sheduler();
-sheduler.Start();
-
 Console.ReadLine();
 
+//МЕТОДЫ ДЛЯ РАБОТЫ
+
+// сохраняет дату повторения инсайта 
+static async void setRepeat(
+    int inHowManyDaysToRepeat,
+    ITelegramBotClient botClient, 
+    Insight_bott.User? currentUserFromDb,
+    int idOfInsight,
+    string callbackQueryId)
+{
+    bool isFound = false;
+    // ищем инсайт по которому нужно сохранить дату повторения
+    foreach (Insight insight in currentUserFromDb.Insights)
+    {
+        if (insight.Id == idOfInsight)
+        {
+            isFound = true;
+            insight.CreateRepeat(inHowManyDaysToRepeat);
+            await DbHelper.db.SaveChangesAsync();
+            string dateOfRepeting = insight.WhenToRepeat.Value.ToShortDateString();
+            await botClient.AnswerCallbackQueryAsync(callbackQueryId, $"Повторю {dateOfRepeting}");
+            break;
+        }
+    }
+    // если не нашли инсайт по которому пришел запрос
+    if (isFound != true)
+    {
+        await botClient.AnswerCallbackQueryAsync(callbackQueryId, "Инсайт не найден");
+    }
+}
