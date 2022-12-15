@@ -11,11 +11,13 @@ namespace Insight_bott
         public int NumberOfLastThought { get; set; }
         public bool WantToAddAnInsight { get; set; }
         
+        public bool isAsign { get; set; }
+        
         public User(long telegramId)
         {
-            
             TelegramId = telegramId;
             WantToAddAnInsight = false;
+            isAsign = true;
 
             NumberOfLastThought = 0;
         }

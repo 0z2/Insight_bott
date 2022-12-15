@@ -1,6 +1,9 @@
-﻿using Quartz;
+﻿using System.Diagnostics;
+using Insight_bott.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 using Telegram.Bot;
-using Telegram.Bot.Types;
+using Exception = System.Exception;
 
 
 namespace Insight_bott.Jobs
@@ -27,23 +30,24 @@ namespace Insight_bott.Jobs
             // рассылаем ежедневные инсайты пользователям
             foreach (User user in currentUsersFromDb)
             {
+                // если пользователь заблокировал отправку - пропускаем
+                if (user.isAsign == false) continue;
                 try
                 {
                     // ежедневный инсайт
                     user.GetCurrentInsight(out string textOfCurrentInsight, out int idInsightInDb);
-                    AnswersMethods.SendInsight(textOfCurrentInsight, idInsightInDb, user.TelegramId);
-                    
+                    AnswersMethods.SendInsight(textOfCurrentInsight, idInsightInDb, user.TelegramId, user);
                     // инсайты с сегодняшней датой повторения
                     foreach (Insight insight in user.Insights)
                     {
                         if (insight.WhenToRepeat == DateTime.Today && insight.Id != idInsightInDb)
                         {
-                            AnswersMethods.SendInsight(insight.TextOfInsight, insight.Id, user.TelegramId);
+                            AnswersMethods.SendInsight(insight.TextOfInsight, insight.Id, user.TelegramId, user);
                             insight.WhenToRepeat = null;
                         }
                     }
                 }
-                catch(ArgumentOutOfRangeException)
+                catch (ArgumentOutOfRangeException)
                 {
                     // если у пользователя нет ни одного инсайта
                     await TelegramBotHelper.Client.SendTextMessageAsync(
@@ -53,7 +57,6 @@ namespace Insight_bott.Jobs
                         "и затем напишите текст инсайта.");
                 }
             }
-
             await DbHelper.db.SaveChangesAsync();
         }
     }

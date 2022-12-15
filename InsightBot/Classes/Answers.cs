@@ -1,6 +1,7 @@
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using Exception = System.Exception;
 
 namespace Insight_bott;
 
@@ -22,7 +23,9 @@ public static class AnswersMethods
         if (user is not null)
         {
             isAlreadyInBase = true;
-            await botClient.SendTextMessageAsync(message.Chat.Id, "Вы уже есть в списке пользователей.");
+            user.isAsign = true;
+            await DbHelper.db.SaveChangesAsync(token);
+            await botClient.SendTextMessageAsync(message.Chat.Id, "Бот включен");
         }
         //если пользователя нет в базе, тогда добавляем
         else if (isAlreadyInBase == false)
@@ -70,7 +73,8 @@ public static class AnswersMethods
     public static async void SendInsight(
         string textOfCurrentUserInsight,
         int idInsightInDb,
-        long currentUserTgId)
+        long currentUserTgId,
+        User? user = null)
     {
             // пример создания инлайн кнопок https://stackoverflow.com/questions/62797191/how-to-add-two-inline-buttons-to-a-telegram-bot-by-c
         
@@ -101,9 +105,32 @@ public static class AnswersMethods
                 row3
             });
 
+            try
+            {
+                 // отправляем текст инсайта с инлайн кнопкой удаления
+                await TelegramBotHelper.Client.SendTextMessageAsync(
+                             currentUserTgId, 
+                             textOfCurrentUserInsight, 
+                             replyMarkup: inlineKeyboard);
+            }
+            catch (Telegram.Bot.Exceptions.ApiRequestException e)
+            {
+                if (e.Message == "Forbidden: bot was blocked by the user")
+                {
+                    // отмечаем что юзер заблокировал сообщения
+                    user.isAsign = false;
+                    await DbHelper.db.SaveChangesAsync();
+                    
+                    // добавить логгирование
+                    Console.WriteLine(user.TelegramId + " заблокировал сообщения");
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-            // отправляем текст инсайта с инлайн кнопкой удаления
-            await TelegramBotHelper.Client.SendTextMessageAsync(
-                currentUserTgId, textOfCurrentUserInsight, replyMarkup: inlineKeyboard);
+
+
     }
 }

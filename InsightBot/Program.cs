@@ -136,6 +136,7 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
             {
                 await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "Инсайт удален");
                 await DbHelper.db.SaveChangesAsync();
+                
             }
             else
             {
