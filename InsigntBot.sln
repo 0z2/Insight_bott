@@ -5,6 +5,8 @@ VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsightBot", "InsightBot\InsightBot.csproj", "{E539F23E-BADF-4131-9C25-B2663E6C7591}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsightBot.Tests", "InsightBot.Tests\InsightBot.Tests.csproj", "{F045815E-E347-4C26-91C7-023962F33FB7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{E539F23E-BADF-4131-9C25-B2663E6C7591}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E539F23E-BADF-4131-9C25-B2663E6C7591}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E539F23E-BADF-4131-9C25-B2663E6C7591}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F045815E-E347-4C26-91C7-023962F33FB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F045815E-E347-4C26-91C7-023962F33FB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F045815E-E347-4C26-91C7-023962F33FB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F045815E-E347-4C26-91C7-023962F33FB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

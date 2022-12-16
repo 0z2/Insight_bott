@@ -22,11 +22,11 @@ namespace Insight_bott.Jobs
             ITrigger trigger = TriggerBuilder.Create() // создаем триггер
                 .WithIdentity("trigger1", "group1") // идентифицируем триггер с именем и группой
                 .StartNow() // запуск сразу после начала выполнения
-                .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(22, 38))
+                .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(10, 30))
                 .Build();
 
             // начинаем выполнение работы
-            await scheduler.ScheduleJob(job, trigger);        
+            await scheduler.ScheduleJob(job, trigger);
         }
     }
 }

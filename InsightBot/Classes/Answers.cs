@@ -76,61 +76,69 @@ public static class AnswersMethods
         long currentUserTgId,
         User? user = null)
     {
-            // пример создания инлайн кнопок https://stackoverflow.com/questions/62797191/how-to-add-two-inline-buttons-to-a-telegram-bot-by-c
+
+        CreateInlineButtons(idInsightInDb, out InlineKeyboardMarkup inlineKeyboard);
+
+        try
+        {
+             // отправляем текст инсайта с инлайн кнопкой удаления
+            await TelegramBotHelper.Client.SendTextMessageAsync(
+                         currentUserTgId, 
+                         textOfCurrentUserInsight, 
+                         replyMarkup: inlineKeyboard);
+        }
+        catch (Telegram.Bot.Exceptions.ApiRequestException e)
+        {
+            if (e.Message == "Forbidden: bot was blocked by the user")
+            {
+                // отмечаем что юзер заблокировал сообщения
+                user.isAsign = false;
+                await DbHelper.db.SaveChangesAsync();
+                
+                // добавить логгирование
+                Console.WriteLine(user.TelegramId + " заблокировал сообщения");
+            }
+            else
+            {
+                throw;
+            }
+        }
+    }
+
+    public static void CreateInlineButtons(int idInsightInDb, out InlineKeyboardMarkup inlineKeyboard)
+    {
+        // пример создания инлайн кнопок https://stackoverflow.com/questions/62797191/how-to-add-two-inline-buttons-to-a-telegram-bot-by-c
         
-            // создаем инлайн кнопку для удаления инсайта
-            InlineKeyboardButton deleteButton = new InlineKeyboardButton("Удалить");
-            deleteButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Удалить");
+        // создаем инлайн кнопку для удаления инсайта
+        InlineKeyboardButton deleteButton = new InlineKeyboardButton("Удалить");
+        deleteButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Удалить");
             
-            // создаем инлайн кнопку для удаления инсайта
-            InlineKeyboardButton repeatTomorrowButton = new InlineKeyboardButton("Повторить завтра");
-            repeatTomorrowButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить завтра";
+        // создаем инлайн кнопку для удаления инсайта
+        InlineKeyboardButton repeatTomorrowButton = new InlineKeyboardButton("Повторить завтра");
+        repeatTomorrowButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить завтра";
 
-            // создаем инлайн кнопку для удаления инсайта
-            InlineKeyboardButton repeatInADayButton = new InlineKeyboardButton("Повторить через день");
-            repeatInADayButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить через день";
+        // создаем инлайн кнопку для удаления инсайта
+        InlineKeyboardButton repeatInADayButton = new InlineKeyboardButton("Повторить через день");
+        repeatInADayButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить через день";
             
-            // создаем инлайн кнопку для удаления инсайта
-            InlineKeyboardButton repeatInAWeekButton = new InlineKeyboardButton("Повторить через неделю");
-            repeatInAWeekButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить через неделю";
+        // создаем инлайн кнопку для удаления инсайта
+        InlineKeyboardButton repeatInAWeekButton = new InlineKeyboardButton("Повторить через неделю");
+        repeatInAWeekButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить через неделю";
 
-            InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { repeatTomorrowButton, repeatInADayButton };
-            InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { repeatInAWeekButton};
-            InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { deleteButton };
+        InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { repeatTomorrowButton, repeatInADayButton };
+        InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { repeatInAWeekButton};
+        InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { deleteButton };
             
-            var inlineKeyboard = new InlineKeyboardMarkup(new[]
-            {
-                row1,
-                row2,
-                row3
-            });
+        inlineKeyboard = new InlineKeyboardMarkup(new[]
+        {
+            row1,
+            row2,
+            row3
+        });
+    }
 
-            try
-            {
-                 // отправляем текст инсайта с инлайн кнопкой удаления
-                await TelegramBotHelper.Client.SendTextMessageAsync(
-                             currentUserTgId, 
-                             textOfCurrentUserInsight, 
-                             replyMarkup: inlineKeyboard);
-            }
-            catch (Telegram.Bot.Exceptions.ApiRequestException e)
-            {
-                if (e.Message == "Forbidden: bot was blocked by the user")
-                {
-                    // отмечаем что юзер заблокировал сообщения
-                    user.isAsign = false;
-                    await DbHelper.db.SaveChangesAsync();
-                    
-                    // добавить логгирование
-                    Console.WriteLine(user.TelegramId + " заблокировал сообщения");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-
-
+    public static int TestMethod(int a, int b)
+    {
+        return a + b;
     }
 }
