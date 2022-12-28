@@ -40,6 +40,19 @@ namespace Insight_bott
             }
         }
 
+        public void GetInsightById(int idOfInsight, out string textOfCurrentInsight)
+        {
+            foreach (Insight insight in Insights)
+            {
+                if (insight.Id == idOfInsight)
+                {
+                    textOfCurrentInsight = insight.TextOfInsight;
+                    break;
+                }
+            }
+            textOfCurrentInsight = null;
+        }
+
         public void GetRandomInsight(out string textOfRandomInsight, out int idRandomInsight)
         {
             Random rnd = new Random();

@@ -41,15 +41,15 @@ static Task Error(ITelegramBotClient arg1, Exception arg2, CancellationToken arg
 async Task Update(ITelegramBotClient botClient, Update update, CancellationToken token)
 {
     var message = update.Message;
-    // если событие является текстом
-    if (message != null)
+    // если есть текст сообщения
+    if (message!=null && message.Text != null)
     {
         // логируем запрос
         logger.Write($"Юзер {message.Chat.Username} c id {message.Chat.Id} сделал запрос: {message.Text}.");
         
         var listOfCommands = new List<string>() { "/start", "/get_insight", "/add_new_insight", "/help", "/random_insight" };
         long currentUserTgId = message.Chat.Id;
-
+        
         if (listOfCommands.Contains(message.Text))
         {
             switch (message.Text.ToLower())
@@ -157,9 +157,10 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
         }
 
     }
+    // какой-то непредусмотренный тип события
     else
     {
-        Console.WriteLine("Пришло какое-то непредвиденное событие."); // тут бы добавить админу уведомление
+        Console.WriteLine($"Пришло какое-то непредвиденное событие."); // тут бы добавить админу уведомление
     }
 }
 

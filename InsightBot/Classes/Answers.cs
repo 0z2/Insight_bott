@@ -55,15 +55,27 @@ public static class AnswersMethods
     public static void GetInsight(
         long currentUserTgId,
         out string textOfInsight,
-        out int idOfUserInsightInDb
+        out int idOfUserInsightInDb,
+        int idOfInsight = 0
         )
     {
         // тут можно переписать чтобы сразу корректно подтягивались данные
         var currentUserFromDb = DbHelper.db.Users.Find(currentUserTgId); //юзер который запросил мысль
         DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
 
-        // получаем последний инсайт
-        currentUserFromDb.GetCurrentInsight(out string textOfCurrentUserInsight, out int idOfCurrentUserInsightInDb);
+        string textOfCurrentUserInsight;
+        int idOfCurrentUserInsightInDb = 0;
+        // если id инсайта, которых нужно получить не передано, то получаем текущий в порядке инсайт
+        if (idOfInsight == 0)
+        {
+            // получаем последний инсайт
+            currentUserFromDb.GetCurrentInsight(out textOfCurrentUserInsight, out idOfCurrentUserInsightInDb);
+        }
+        // в противном случае получаем инсайт по id
+        else
+        {
+            currentUserFromDb.GetInsightById(idOfInsight, out textOfCurrentUserInsight);
+        }
         
         // возвращаем
         textOfInsight = textOfCurrentUserInsight;
@@ -108,7 +120,6 @@ public static class AnswersMethods
     public static void CreateInlineButtons(int idInsightInDb, out InlineKeyboardMarkup inlineKeyboard)
     {
         // пример создания инлайн кнопок https://stackoverflow.com/questions/62797191/how-to-add-two-inline-buttons-to-a-telegram-bot-by-c
-        
         // создаем инлайн кнопку для удаления инсайта
         InlineKeyboardButton deleteButton = new InlineKeyboardButton("Удалить");
         deleteButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Удалить");
@@ -131,12 +142,11 @@ public static class AnswersMethods
             
         inlineKeyboard = new InlineKeyboardMarkup(new[]
         {
-            row1,
-            row2,
-            row3
+            row1, row2, row3
         });
     }
-
+    
+    // завел метод поглядеть как тесты работают
     public static int TestMethod(int a, int b)
     {
         return a + b;

@@ -2,4 +2,7 @@
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;
   &lt;Assembly Path="/Users/betehtin/.nuget/packages/dotenv/0.0.1.1/lib/net40/DotEnv.dll" /&gt;
   &lt;Assembly Path="/Users/betehtin/.nuget/packages/telegram.bot/18.0.0/lib/netcoreapp3.1/Telegram.Bot.dll" /&gt;
-&lt;/AssemblyExplorer&gt;</s:String></wpf:ResourceDictionary>
+&lt;/AssemblyExplorer&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=c7bc5858_002D7601_002D480a_002D88d9_002D048fe2e2fbc8/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from UnitTest1.cs" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;ProjectFile&gt;F045815E-E347-4C26-91C7-023962F33FB7/f:UnitTest1.cs&lt;/ProjectFile&gt;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
