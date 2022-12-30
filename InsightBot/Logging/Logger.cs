@@ -1,15 +1,25 @@
 using System.Text;
-
 namespace Insight_bott.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 // https://metanit.com/sharp/dotnet/1.3.php тут подробнее о том как работает
 
-//var logger = new Logger(new SimpleLogService());
-//logger.Log("Hello METANIT.COM");
- 
-//logger = new Logger(new GreenLogService());
-//ogger.Log("Hello METANIT.COM");
+// создаем сервис логирования
 
+// возможно я делаю какую-то херню вынося создание сервис провайдера в отдельный класс и это надо делать как-то иначе
+class ServiceProvider
+    {
+        static IServiceCollection services;
+        private static Microsoft.Extensions.DependencyInjection.ServiceProvider serviceProvider;
+        public static ILogService Logger { get; set; }
+        public static void CreateServiceProvider()
+        {
+            services = new ServiceCollection().AddSingleton<ILogService, SimpleLogService>();
+            serviceProvider = services.BuildServiceProvider();
+
+            Logger = serviceProvider.GetService<ILogService>();
+        }
+    }
 
 interface ILogService
 {

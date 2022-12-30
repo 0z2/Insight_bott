@@ -37,9 +37,9 @@ public static class AnswersMethods
                 UserFromDb.isAsign = false;
                 await DbHelper.db.SaveChangesAsync();
                 
-                //var timeService = serviceProvider.GetService<ITimeService>();
-                // добавить логгирование
-                Console.WriteLine($"Пользователь c id {UserTgId} заблокировал сообщения");
+                // логируем запрос
+                Logging.ServiceProvider.Logger.Write(
+                    $"Юзер c id {UserFromDb.TelegramId} заблокировал сообщения");
             }
             else
             {
@@ -66,7 +66,7 @@ public static class AnswersMethods
             isAlreadyInBase = true;
             user.isAsign = true;
             await DbHelper.db.SaveChangesAsync(token);
-            await botClient.SendTextMessageAsync(message.Chat.Id, "Бот включен");
+            SendMessage(message.Chat.Id, "Бот включен");
         }
         //если пользователя нет в базе, тогда добавляем
         else if (isAlreadyInBase == false)

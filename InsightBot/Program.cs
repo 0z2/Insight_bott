@@ -1,18 +1,13 @@
 ﻿using Insight_bott;
+using Insight_bott.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Insight_bott.Logging;
-using Microsoft.Extensions.DependencyInjection;
 
 // создаем соединение с базой в классе DbHelper чтобы потом можно было из разных местах программы с базой работать
 DbHelper db_new = new DbHelper();
 
-// создаем сервис логирования
-IServiceCollection services = new ServiceCollection()
-    .AddSingleton<ILogService, SimpleLogService>();
-using ServiceProvider serviceProvider = services.BuildServiceProvider();
-var logger = serviceProvider.GetService<ILogService>();
-
+// создаем сервис логгирования
+ServiceProvider.CreateServiceProvider();
 
 //эта штука достает переменные из env файла. Вроде как env файл должен лежать в корне
 DotNetEnv.Env.TraversePath().Load();
@@ -45,7 +40,7 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
     if (message!=null && message.Text != null)
     {
         // логируем запрос
-        logger.Write($"Юзер {message.Chat.Username} c id {message.Chat.Id} сделал запрос: {message.Text}.");
+        ServiceProvider.Logger.Write($"Юзер {message.Chat.Username} c id {message.Chat.Id} сделал запрос: {message.Text}.");
         
         var listOfCommands = new List<string>() { "/start", "/get_insight", "/add_new_insight", "/help", "/random_insight" };
         long currentUserTgId = message.Chat.Id;
