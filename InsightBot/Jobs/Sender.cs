@@ -5,7 +5,6 @@ using Quartz;
 using Telegram.Bot;
 using Exception = System.Exception;
 
-
 namespace Insight_bott.Jobs
 {
     public class Sender : IJob
@@ -14,7 +13,6 @@ namespace Insight_bott.Jobs
         {
             
         }
-        
         public async Task Execute(IJobExecutionContext context)
         {
             DotNetEnv.Env.TraversePath().Load();
@@ -36,13 +34,14 @@ namespace Insight_bott.Jobs
                 {
                     // ежедневный инсайт
                     user.GetCurrentInsight(out string textOfCurrentInsight, out int idInsightInDb);
-                    AnswersMethods.SendInsight(textOfCurrentInsight, idInsightInDb, user.TelegramId, user);
+                    AnswersMethods.SendInsight(textOfCurrentInsight, idInsightInDb, user.TelegramId);
+                    
                     // инсайты с сегодняшней датой повторения
                     foreach (Insight insight in user.Insights)
                     {
                         if (insight.WhenToRepeat == DateTime.Today && insight.Id != idInsightInDb)
                         {
-                            AnswersMethods.SendInsight(insight.TextOfInsight, insight.Id, user.TelegramId, user);
+                            AnswersMethods.SendInsight(insight.TextOfInsight, insight.Id, user.TelegramId);
                             insight.WhenToRepeat = null;
                         }
                     }
@@ -50,8 +49,7 @@ namespace Insight_bott.Jobs
                 catch (ArgumentOutOfRangeException)
                 {
                     // если у пользователя нет ни одного инсайта
-                    await TelegramBotHelper.Client.SendTextMessageAsync(
-                        user.TelegramId,
+                    AnswersMethods.SendMessage(user.TelegramId, 
                         "У вас не сохранено ни одного инсайта.\n" +
                         "Для добавления нового инасайте нажмите на /add_new_insight " +
                         "и затем напишите текст инсайта.");

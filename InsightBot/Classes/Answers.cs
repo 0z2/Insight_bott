@@ -7,6 +7,47 @@ namespace Insight_bott;
 
 public static class AnswersMethods
 {
+    public static async void SendMessage(
+        long UserTgId,
+        string textOfMessage,
+        IReplyMarkup replyMarkup = null)
+    {
+        try
+        {
+            if (replyMarkup is null)
+            {
+                await TelegramBotHelper.Client.SendTextMessageAsync(
+                    UserTgId, textOfMessage);
+            }
+            else
+            {
+                await TelegramBotHelper.Client.SendTextMessageAsync(
+                    UserTgId, 
+                    textOfMessage, 
+                    replyMarkup: replyMarkup);
+            }
+
+        }
+        catch (Telegram.Bot.Exceptions.ApiRequestException e)
+        {
+            if (e.Message == "Forbidden: bot was blocked by the user")
+            {
+                // отмечаем что юзер заблокировал сообщения
+                var UserFromDb = DbHelper.db.Users.Find(UserTgId); //юзер который запросил мысль
+                UserFromDb.isAsign = false;
+                await DbHelper.db.SaveChangesAsync();
+                
+                //var timeService = serviceProvider.GetService<ITimeService>();
+                // добавить логгирование
+                Console.WriteLine($"Пользователь c id {UserTgId} заблокировал сообщения");
+            }
+            else
+            {
+                throw;
+            }
+        }
+    }
+    
     public static async void Start(
         ITelegramBotClient botClient,
         Message message,
@@ -42,12 +83,14 @@ public static class AnswersMethods
             }
 
             DbHelper.db.Users.Add(newUser); // добавляем в таблицу нового пользователя
-
-            await botClient.SendTextMessageAsync(
-                message.Chat.Id, "Вы были добавлены в список пользователей.\n" +
-                                 "В этом боте вы можете сохранять значимые для себя мысли. " +
-                                 "Каждое утро бот будет присылать по одной из них.\n" +
-                                 "Для добавления мысли нажмите /add_new_insight");
+            
+            AnswersMethods.SendMessage(
+                message.Chat.Id,
+                "Вы были добавлены в список пользователей.\n" +
+                "В этом боте вы можете сохранять значимые для себя мысли. " +
+                "Каждое утро бот будет присылать по одной из них.\n" +
+                "Для добавления мысли нажмите /add_new_insight");
+            
             // сохраняем изменения в таблице
             await DbHelper.db.SaveChangesAsync(token); // разобраться что это за токен такой и для чего он нужен
         }
@@ -85,36 +128,11 @@ public static class AnswersMethods
     public static async void SendInsight(
         string textOfCurrentUserInsight,
         int idInsightInDb,
-        long currentUserTgId,
-        User? user = null)
+        long currentUserTgId)
     {
-
         CreateInlineButtons(idInsightInDb, out InlineKeyboardMarkup inlineKeyboard);
-
-        try
-        {
-             // отправляем текст инсайта с инлайн кнопкой удаления
-            await TelegramBotHelper.Client.SendTextMessageAsync(
-                         currentUserTgId, 
-                         textOfCurrentUserInsight, 
-                         replyMarkup: inlineKeyboard);
-        }
-        catch (Telegram.Bot.Exceptions.ApiRequestException e)
-        {
-            if (e.Message == "Forbidden: bot was blocked by the user")
-            {
-                // отмечаем что юзер заблокировал сообщения
-                user.isAsign = false;
-                await DbHelper.db.SaveChangesAsync();
-                
-                // добавить логгирование
-                Console.WriteLine(user.TelegramId + " заблокировал сообщения");
-            }
-            else
-            {
-                throw;
-            }
-        }
+        // отправляем текст инсайта с инлайн кнопкой удаления
+        SendMessage(currentUserTgId, textOfCurrentUserInsight, replyMarkup: inlineKeyboard);
     }
 
     public static void CreateInlineButtons(int idInsightInDb, out InlineKeyboardMarkup inlineKeyboard)

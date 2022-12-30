@@ -65,14 +65,19 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                     }
                     catch (Exception)
                     {
-                        botClient.SendTextMessageAsync(
-                            chatId: currentUserTgId,
-                            text: $"Список инсайтов пуст. Добавьте новый инсайт /add_new_insight");
+                        AnswersMethods.SendMessage(
+                            currentUserTgId, 
+                            "Список инсайтов пуст. Добавьте новый инсайт /add_new_insight");
                     }
                     break;
                 case "/random_insight":
                     // тут можно переписать чтобы сразу корректно подтягивались данные
                     var UserFromDb = DbHelper.db.Users.Find(currentUserTgId); //юзер который запросил мысль
+                    if (UserFromDb is null)
+                    {
+                        AnswersMethods.Start(botClient, message, currentUserTgId, token);
+                        UserFromDb = DbHelper.db.Users.Find(currentUserTgId);
+                    }
                     DbHelper.db.Entry(UserFromDb).Collection(c => c.Insights).Load();
                     
                     UserFromDb.GetRandomInsight(out string textOfRandomInsight, out int idRandomInsight);
@@ -82,14 +87,15 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                     var currentUserFromDb = DbHelper.db.Users.Find(currentUserTgId); //юзер который запросил мысль
                     currentUserFromDb.WantToAddAnInsight = true;
                     await DbHelper.db.SaveChangesAsync(token); // сохранение 
-                    await botClient.SendTextMessageAsync(message.Chat.Id, "Введите текст инсайта");
+                    AnswersMethods.SendMessage(message.Chat.Id, "Введите текст инсайта");
                     break;
                 case "/help":
-                    await botClient.SendTextMessageAsync(
-                        message.Chat.Id, "В этом боте вы можете сохранять значимые для себя мысли. " +
-                                         "Каждое утро бот будет присылать по одной из них.\n" +
-                                         "Для добавления мысли нажмите /add_new_insight");
-                    break;
+
+                        AnswersMethods.SendMessage(message.Chat.Id,
+                            "В этом боте вы можете сохранять значимые для себя мысли. " +
+                            "Каждое утро бот будет присылать по одной из них.\n" +
+                            "Для добавления мысли нажмите /add_new_insight");
+                        break;
             }
         }
         // просто пришел какой-то текст
@@ -103,7 +109,7 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                 // сохраняем новый инсайт в список инсайтов пользователя
                 currentUserFromDb.AddNewInsight(message.Text);
                 var answer = await DbHelper.db.SaveChangesAsync(); // сохранение 
-                await botClient.SendTextMessageAsync(message.Chat.Id, "Инсайт сохранен");
+                AnswersMethods.SendMessage(message.Chat.Id, "Инсайт сохранен");
                 
                 // id нового инсайта в db
                 var idOfNewInsight = currentUserFromDb.Insights.Last().Id;
@@ -160,7 +166,7 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
     // какой-то непредусмотренный тип события
     else
     {
-        Console.WriteLine($"Пришло какое-то непредвиденное событие."); // тут бы добавить админу уведомление
+        Console.WriteLine($"Пришло какое-то непредвиденное событие."); // тут бы логирование добавить
     }
 }
 
