@@ -6,6 +6,12 @@ using Telegram.Bot.Types;
 // создаем соединение с базой в классе DbHelper чтобы потом можно было из разных местах программы с базой работать
 DbHelper db_new = new DbHelper();
 
+// добавляем в список для уведомлений админа уведомление в консоль
+AnswersMethods.RegisterNotifier(Console.WriteLine);
+// добавляем в список для уведомлений админа уведомление в личные сообщения телеграма
+AnswersMethods.RegisterNotifier(SendMessageToAdminInTelegram);
+
+
 // создаем сервис логгирования
 ServiceProvider.CreateServiceProvider();
 
@@ -17,11 +23,8 @@ var telegramBotApiKey = Environment.GetEnvironmentVariable("TELEGRAM_API_KEY");
 TelegramBotHelper telegramBotHelperClient = new TelegramBotHelper(telegramBotApiKey);
 
 
-// отправляем админу сообщение о том что бот запущен
-var adminId = Environment.GetEnvironmentVariable("ADMIN_ID");
-Message message = await TelegramBotHelper.Client.SendTextMessageAsync(
-    chatId: adminId,
-    text: "Бот запущен!");
+// Уведомляем админа о запуске бота
+AnswersMethods.AdminNotifier("Бот запущен");
 
 // запускаем шедулер для ежедневных уведомлений
 Insight_bott.Jobs.Sheduler sheduler = new Insight_bott.Jobs.Sheduler();
@@ -41,7 +44,7 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
     {
         // логируем запрос
         ServiceProvider.Logger.Write($"Юзер {message.Chat.Username} c id {message.Chat.Id} сделал запрос: {message.Text}.");
-        
+
         var listOfCommands = new List<string>() { "/start", "/get_insight", "/add_new_insight", "/help", "/random_insight" };
         long currentUserTgId = message.Chat.Id;
         
@@ -161,13 +164,24 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
     // какой-то непредусмотренный тип события
     else
     {
-        Console.WriteLine($"Пришло какое-то непредвиденное событие."); // тут бы логирование добавить
+        Console.WriteLine($"Пришло какое-то непредвиденное событие типа {message.Type}."); // тут бы логирование добавить
+        AnswersMethods.AdminNotifier(
+            $"Юзер {message.Chat.Username} c id {message.Chat.Id} прислал непредвиденное событие типа {message.Type}");
     }
 }
 
 Console.ReadLine();
 
 //МЕТОДЫ ДЛЯ РАБОТЫ
+
+// уведомления в личку админу
+// отправляем админу сообщение о том что бот запущен
+static void SendMessageToAdminInTelegram(string messageToAdmin)
+{
+    var adminId = Convert.ToInt64(Environment.GetEnvironmentVariable("ADMIN_ID"));
+    AnswersMethods.SendMessage(adminId, messageToAdmin);
+}
+
 
 // сохраняет дату повторения инсайта 
 static async void setRepeat(

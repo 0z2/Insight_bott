@@ -1,12 +1,19 @@
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
-using Exception = System.Exception;
 
 namespace Insight_bott;
 
+public delegate void AdminNotifier(string message);
 public static class AnswersMethods
 {
+    // Создаем переменную делегата
+    public static AdminNotifier? AdminNotifier;
+    // Регистрируем делегат
+    public static void RegisterNotifier(AdminNotifier func)
+    {
+        AdminNotifier += func;
+    }
     public static async void SendMessage(
         long UserTgId,
         string textOfMessage,
@@ -138,19 +145,17 @@ public static class AnswersMethods
     public static void CreateInlineButtons(int idInsightInDb, out InlineKeyboardMarkup inlineKeyboard)
     {
         // пример создания инлайн кнопок https://stackoverflow.com/questions/62797191/how-to-add-two-inline-buttons-to-a-telegram-bot-by-c
-        // создаем инлайн кнопку для удаления инсайта
+        
+        // создаем кнопки инсайтов
         InlineKeyboardButton deleteButton = new InlineKeyboardButton("Удалить");
         deleteButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Удалить");
             
-        // создаем инлайн кнопку для удаления инсайта
         InlineKeyboardButton repeatTomorrowButton = new InlineKeyboardButton("Повторить завтра");
         repeatTomorrowButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить завтра";
 
-        // создаем инлайн кнопку для удаления инсайта
         InlineKeyboardButton repeatInADayButton = new InlineKeyboardButton("Повторить через день");
         repeatInADayButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить через день";
             
-        // создаем инлайн кнопку для удаления инсайта
         InlineKeyboardButton repeatInAWeekButton = new InlineKeyboardButton("Повторить через неделю");
         repeatInAWeekButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить через неделю";
 
