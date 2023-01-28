@@ -166,16 +166,20 @@ public static class AnswersMethods
             
         InlineKeyboardButton singleRepititionButton = new InlineKeyboardButton("Разовое повторение");
         singleRepititionButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Разовое повторение"  + "," + messageId);
-
+        
+        InlineKeyboardButton deleteRepititionButton = new InlineKeyboardButton("Отключить повторения");
+        deleteRepititionButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Отключить повторения" + "," + messageId);
+        
         InlineKeyboardButton deleteButton = new InlineKeyboardButton("Удалить");
         deleteButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Удалить" + "," + messageId);
 
         InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { regularRepeatButton, singleRepititionButton };
-        InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { deleteButton};
+        InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { deleteRepititionButton };
+        InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { deleteButton };
 
         inlineKeyboard = new InlineKeyboardMarkup(new[]
         {
-            row1, row2
+            row1, row2, row3
         });
         
     }
@@ -198,6 +202,32 @@ public static class AnswersMethods
 
         InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { repeatTomorrowButton, repeatInADayButton };
         InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { repeatInAWeekButton};
+        InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { backButton };
+            
+        inlineKeyboard = new InlineKeyboardMarkup(new[]
+        {
+            row1, row2, row3
+        });
+    }
+    public static void CreateRegularReptitionInlineButtons(int idInsightInDb, out InlineKeyboardMarkup inlineKeyboard, int? messageId=null)
+    {
+        // пример создания инлайн кнопок https://stackoverflow.com/questions/62797191/how-to-add-two-inline-buttons-to-a-telegram-bot-by-c
+        
+        // создаем кнопки инсайтов
+        InlineKeyboardButton backButton = new InlineKeyboardButton("Назад");
+        backButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Назад" + "," + messageId);
+            
+        InlineKeyboardButton repeatDailyButton = new InlineKeyboardButton("Повторять ежедневно");
+        repeatDailyButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторять ежедневно" + "," + messageId;
+
+        InlineKeyboardButton repeatInADayButton = new InlineKeyboardButton("Повторять через день");
+        repeatInADayButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Повторять через день" + "," + messageId);
+            
+        InlineKeyboardButton repeatWeeklyButton = new InlineKeyboardButton("Повторять еженедельно");
+        repeatWeeklyButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Повторять еженедельно" + "," + messageId);
+
+        InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { repeatDailyButton, repeatInADayButton };
+        InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { repeatWeeklyButton};
         InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { backButton };
             
         inlineKeyboard = new InlineKeyboardMarkup(new[]

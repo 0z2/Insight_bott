@@ -36,13 +36,27 @@ namespace Insight_bott.Jobs
                     user.GetCurrentInsight(out string textOfCurrentInsight, out int idInsightInDb);
                     AnswersMethods.SendInsight(textOfCurrentInsight, idInsightInDb, user.TelegramId);
                     
-                    // инсайты с сегодняшней датой повторения
+                    // проссматриваем инсайты
                     foreach (Insight insight in user.Insights)
                     {
+                        // инсайты с сегодняшней датой повторения, за исключением ежедневного инсайта
                         if (insight.WhenToRepeat == DateTime.Today && insight.Id != idInsightInDb)
                         {
                             AnswersMethods.SendInsight(insight.TextOfInsight, insight.Id, user.TelegramId);
                             insight.WhenToRepeat = null;
+                            insight.DayOfLastRepeat = DateTime.Today;
+                        }
+                        // если установлено регулярное повторение
+                        if (insight.HowOftenRepeatInDays is not null)
+                        {
+                            TimeSpan difference = DateTime.Today - insight.DayOfLastRepeat.GetValueOrDefault();
+                            int differenceInDays = difference.Days;
+                            // если количество дней с даты последнего повторения больше или равно дней регулярности повторения
+                            if (differenceInDays >= insight.HowOftenRepeatInDays)
+                            {
+                                AnswersMethods.SendInsight(insight.TextOfInsight, insight.Id, user.TelegramId);
+                                insight.DayOfLastRepeat = DateTime.Today;
+                            }
                         }
                     }
                 }
