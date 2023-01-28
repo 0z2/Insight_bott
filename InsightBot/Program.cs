@@ -157,14 +157,56 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                 }
                 break;
             case "Повторить завтра":
-                setSingleRepeat(1, botClient, currentUserFromDb, idOfInsight, callbackQueryId);
-                break;
-            case"Повторить через день":
-                setSingleRepeat(2, botClient, currentUserFromDb, idOfInsight, callbackQueryId);
+            {
+                var information = new InformationForSingleReptition()
+                {
+                    TextOfMessage =  "Повторю завтра",
+                    InHowManyDaysToRepeat = 1
+                };
+                changeRepetition(
+                    botClient, 
+                    currentUserFromDb, 
+                    idOfInsight, 
+                    callbackQueryId, 
+                    setSingleRepeat,
+                    information);
+                break;                
+            }
+
+            case "Повторить через день":
+            {
+                var information = new InformationForSingleReptition()
+                {
+                    TextOfMessage =  "Повторю послезавтра",
+                    InHowManyDaysToRepeat = 2
+                };
+                changeRepetition(
+                    botClient, 
+                    currentUserFromDb, 
+                    idOfInsight, 
+                    callbackQueryId, 
+                    setSingleRepeat,
+                    information);                
+            }
+
                 break;
             case "Повторить через неделю":
-                setSingleRepeat(7, botClient, currentUserFromDb, idOfInsight, callbackQueryId);
+            {
+                var information = new InformationForSingleReptition()
+                {
+                    TextOfMessage =  "Повторю через неделю",
+                    InHowManyDaysToRepeat = 7
+                };
+                changeRepetition(
+                    botClient, 
+                    currentUserFromDb, 
+                    idOfInsight, 
+                    callbackQueryId, 
+                    setSingleRepeat,
+                    information);  
                 break;
+            }
+            
             case "Повторять ежедневно":
                 setRegularRepeatition(1, botClient, currentUserFromDb, idOfInsight, callbackQueryId);
                 break;
@@ -186,9 +228,9 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                 // меняем базовые кнопки на кнопки разового повторения
                 AnswersMethods.CreateSingleReptitionInlineButtons(idOfInsight, out var inlineKeyboard, messageId);
                 TelegramBotHelper.Client.EditMessageReplyMarkupAsync(userTelegramId, messageId, inlineKeyboard);
+
                 break;
             }
-
             case "Назад":
             {
                 // меняем кнопки повторений на базовые кнопки
@@ -199,7 +241,24 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
 
             case "Отключить повторения":
             {
-                clearRepetition(botClient, currentUserFromDb, idOfInsight, callbackQueryId);
+                var clearRepetition = (Insight insight, IInformationForFunctions information) =>
+                {
+                    insight.WhenToRepeat = null;
+                    insight.HowOftenRepeatInDays = null;
+                };
+
+                var information = new InformationForClearReptition()
+                {
+                    TextOfMessage =  "Повторения отключены"
+                };
+
+                changeRepetition(
+                    botClient,
+                    currentUserFromDb,
+                    idOfInsight,
+                    callbackQueryId,
+                    clearRepetition,
+                    information);
                 break;
             }
 
@@ -230,32 +289,10 @@ static void SendMessageToAdminInTelegram(string messageToAdmin)
 
 
 // сохраняет дату разового повторения инсайта 
-static async void setSingleRepeat(
-    int inHowManyDaysToRepeat,
-    ITelegramBotClient botClient, 
-    Insight_bott.User? currentUserFromDb,
-    int idOfInsight,
-    string callbackQueryId)
+static void setSingleRepeat(Insight insight, IInformationForFunctions information)
 {
-    bool isFound = false;
-    // ищем инсайт по которому нужно сохранить дату повторения
-    foreach (Insight insight in currentUserFromDb.Insights)
-    {
-        if (insight.Id == idOfInsight)
-        {
-            isFound = true;
-            insight.CreateSingleRepeatition(inHowManyDaysToRepeat);
-            await DbHelper.db.SaveChangesAsync();
-            string dateOfRepeting = insight.WhenToRepeat.Value.ToShortDateString();
-            await botClient.AnswerCallbackQueryAsync(callbackQueryId, $"Повторю {dateOfRepeting}");
-            break;
-        }
-    }
-    // если не нашли инсайт по которому пришел запрос
-    if (isFound != true)
-    {
-        await botClient.AnswerCallbackQueryAsync(callbackQueryId, "Инсайт не найден");
-    }
+            var informationForSingleReptition = information as InformationForSingleReptition;
+            insight.CreateSingleRepeatition(informationForSingleReptition.InHowManyDaysToRepeat);
 }
 
 // сохраняет информацию о регулярном повторении
@@ -273,9 +310,11 @@ static async void setRegularRepeatition(
         if (insight.Id == idOfInsight)
         {
             isFound = true;
+            
             insight.CreateRegularRepeatition(howOftenRepeatInDays);
-            await DbHelper.db.SaveChangesAsync();
+            
             await botClient.AnswerCallbackQueryAsync(callbackQueryId, $"Повторения включены");
+            await DbHelper.db.SaveChangesAsync();
             break;
         }
     }
@@ -286,12 +325,17 @@ static async void setRegularRepeatition(
     }
 }
 
+
+
 // сохраняет дату разового повторения инсайта 
-static async void clearRepetition(
+static async void changeRepetition(
     ITelegramBotClient botClient, 
     Insight_bott.User? currentUserFromDb,
     int idOfInsight,
-    string callbackQueryId)
+    string callbackQueryId,
+    Action<Insight, IInformationForFunctions> changeRepitionFunc,
+    IInformationForFunctions information
+)
 {
     bool isFound = false;
     // ищем инсайт по которому нужно сохранить дату повторения
@@ -300,10 +344,11 @@ static async void clearRepetition(
         if (insight.Id == idOfInsight)
         {
             isFound = true;
-            insight.WhenToRepeat = null;
-            insight.HowOftenRepeatInDays = null;
+
+            changeRepitionFunc(insight, information);
+            
             await DbHelper.db.SaveChangesAsync();
-            await botClient.AnswerCallbackQueryAsync(callbackQueryId, $"Повторения отключены");
+            await botClient.AnswerCallbackQueryAsync(callbackQueryId, information.TextOfMessage);
             break;
         }
     }
