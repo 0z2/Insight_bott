@@ -14,24 +14,30 @@ public static class AnswersMethods
     {
         AdminNotifier += func;
     }
-    public static async void SendMessage(
+    public static void SendMessage(
         long UserTgId,
         string textOfMessage,
-        IReplyMarkup replyMarkup = null)
+        out int idOfMessage,
+        InlineKeyboardMarkup? replyMarkup = null
+        )
     {
+        idOfMessage = 0;
         try
         {
             if (replyMarkup is null)
             {
-                await TelegramBotHelper.Client.SendTextMessageAsync(
+                var sentMessage = TelegramBotHelper.Client.SendTextMessageAsync(
                     UserTgId, textOfMessage);
+                idOfMessage = sentMessage.Result.MessageId;
             }
             else
             {
-                await TelegramBotHelper.Client.SendTextMessageAsync(
+                var sentMessage =  TelegramBotHelper.Client.SendTextMessageAsync(
                     UserTgId, 
-                    textOfMessage, 
-                    replyMarkup: replyMarkup);
+                    textOfMessage,
+                    replyMarkup: replyMarkup
+                    );
+                idOfMessage = sentMessage.Result.MessageId;
             }
 
         }
@@ -42,7 +48,7 @@ public static class AnswersMethods
                 // отмечаем что юзер заблокировал сообщения
                 var UserFromDb = DbHelper.db.Users.Find(UserTgId); //юзер который запросил мысль
                 UserFromDb.isAsign = false;
-                await DbHelper.db.SaveChangesAsync();
+                DbHelper.db.SaveChangesAsync();
                 
                 // логируем запрос
                 Logging.ServiceProvider.Logger.Write(
@@ -53,6 +59,7 @@ public static class AnswersMethods
                 throw;
             }
         }
+        
     }
     
     public static async void Start(
@@ -73,7 +80,7 @@ public static class AnswersMethods
             isAlreadyInBase = true;
             user.isAsign = true;
             await DbHelper.db.SaveChangesAsync(token);
-            SendMessage(message.Chat.Id, "Бот включен");
+            SendMessage(message.Chat.Id, "Бот включен", out int idOfMessage);
         }
         //если пользователя нет в базе, тогда добавляем
         else if (isAlreadyInBase == false)
@@ -96,7 +103,8 @@ public static class AnswersMethods
                 "Вы были добавлены в список пользователей.\n" +
                 "В этом боте вы можете сохранять значимые для себя мысли. " +
                 "Каждое утро бот будет присылать по одной из них.\n" +
-                "Для добавления мысли нажмите /add_new_insight");
+                "Для добавления мысли нажмите /add_new_insight",
+                out int idOfMessage);
             
             // сохраняем изменения в таблице
             await DbHelper.db.SaveChangesAsync(token); // разобраться что это за токен такой и для чего он нужен
@@ -137,31 +145,60 @@ public static class AnswersMethods
         int idInsightInDb,
         long currentUserTgId)
     {
-        CreateInlineButtons(idInsightInDb, out InlineKeyboardMarkup inlineKeyboard);
-        // отправляем текст инсайта с инлайн кнопкой удаления
-        SendMessage(currentUserTgId, textOfCurrentUserInsight, replyMarkup: inlineKeyboard);
+        // добавляем инлйн кнопки. Если их не добавить, то и изменить в дальнейшем не получится
+        CreateBaseInlineButtons(idInsightInDb, out InlineKeyboardMarkup baseInlineKeyboard);
+        // отправляем текст инсайта
+        SendMessage(currentUserTgId, textOfCurrentUserInsight, out int messageId, baseInlineKeyboard);
+        
+        // создаем базовые инлайн кнопки с информацией о id сообщения чтобы можно было редактировать кнопки и отправляем
+        CreateBaseInlineButtons(idInsightInDb, out baseInlineKeyboard, messageId);
+        TelegramBotHelper.Client.EditMessageReplyMarkupAsync(currentUserTgId, messageId, replyMarkup: baseInlineKeyboard);
     }
 
-    public static void CreateInlineButtons(int idInsightInDb, out InlineKeyboardMarkup inlineKeyboard)
+
+    public static void CreateBaseInlineButtons(int idInsightInDb, out InlineKeyboardMarkup inlineKeyboard, int? messageId=null)
     {
         // пример создания инлайн кнопок https://stackoverflow.com/questions/62797191/how-to-add-two-inline-buttons-to-a-telegram-bot-by-c
         
         // создаем кнопки инсайтов
+        InlineKeyboardButton regularRepeatButton = new InlineKeyboardButton("Регулярное повторение");
+        regularRepeatButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Регулярное повторение" + "," + messageId);
+            
+        InlineKeyboardButton singleRepititionButton = new InlineKeyboardButton("Разовое повторение");
+        singleRepititionButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Разовое повторение"  + "," + messageId);
+
         InlineKeyboardButton deleteButton = new InlineKeyboardButton("Удалить");
-        deleteButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Удалить");
+        deleteButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Удалить" + "," + messageId);
+
+        InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { regularRepeatButton, singleRepititionButton };
+        InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { deleteButton};
+
+        inlineKeyboard = new InlineKeyboardMarkup(new[]
+        {
+            row1, row2
+        });
+        
+    }
+    public static void CreateSingleReptitionInlineButtons(int idInsightInDb, out InlineKeyboardMarkup inlineKeyboard, int? messageId=null)
+    {
+        // пример создания инлайн кнопок https://stackoverflow.com/questions/62797191/how-to-add-two-inline-buttons-to-a-telegram-bot-by-c
+        
+        // создаем кнопки инсайтов
+        InlineKeyboardButton backButton = new InlineKeyboardButton("Назад");
+        backButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Назад" + "," + messageId);
             
         InlineKeyboardButton repeatTomorrowButton = new InlineKeyboardButton("Повторить завтра");
-        repeatTomorrowButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить завтра";
+        repeatTomorrowButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить завтра" + "," + messageId;
 
         InlineKeyboardButton repeatInADayButton = new InlineKeyboardButton("Повторить через день");
-        repeatInADayButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить через день";
+        repeatInADayButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Повторить через день" + "," + messageId);
             
         InlineKeyboardButton repeatInAWeekButton = new InlineKeyboardButton("Повторить через неделю");
-        repeatInAWeekButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторить через неделю";
+        repeatInAWeekButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Повторить через неделю" + "," + messageId);
 
         InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { repeatTomorrowButton, repeatInADayButton };
         InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { repeatInAWeekButton};
-        InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { deleteButton };
+        InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { backButton };
             
         inlineKeyboard = new InlineKeyboardMarkup(new[]
         {

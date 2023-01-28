@@ -52,7 +52,8 @@ namespace Insight_bott.Jobs
                     AnswersMethods.SendMessage(user.TelegramId, 
                         "У вас не сохранено ни одного инсайта.\n" +
                         "Для добавления нового инасайте нажмите на /add_new_insight " +
-                        "и затем напишите текст инсайта.");
+                        "и затем напишите текст инсайта.",
+                        out int idOfMessage);
                 }
             }
             await DbHelper.db.SaveChangesAsync();
