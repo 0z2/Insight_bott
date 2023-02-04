@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Insight_bott.Logging;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Telegram.Bot;
@@ -21,9 +22,11 @@ namespace Insight_bott.Jobs
                 chatId: adminId, // скрыть админский id
                 text: "Ежедневная отправка инсайтов пользователям!");
             
-            // тут можно переписать чтобы сразу корректно подтягивались данные
-            var currentUsersFromDb = DbHelper.db.Users.ToList(); //юзер который запросил мысль
-            DbHelper.db.Insights.ToList(); // это чтобы подтянулись в контекст инсайты пользователей
+            // старый вариант загрузки через два запроса к базе
+            //var currentUsersFromDb = DbHelper.db.Users.ToList(); //юзер который запросил мысль
+            //DbHelper.db.Insights.ToList(); // это чтобы подтянулись в контекст инсайты пользователей
+            // новый вариант загрузки одним запросом
+            var currentUsersFromDb = DbHelper.db.Users.Include(x => x.Insights).ToList();
             
             // рассылаем ежедневные инсайты пользователям
             foreach (User user in currentUsersFromDb)

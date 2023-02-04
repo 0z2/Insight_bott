@@ -10,6 +10,11 @@ public class InformationForSingleReptition : IInformationForFunctions
     public int InHowManyDaysToRepeat;
 
 }
+public class InformationForRegularReptition : IInformationForFunctions
+{
+    public int HowOftenInDaysRepeat;
+
+}
 public class InformationForClearReptition : IInformationForFunctions
 {
 

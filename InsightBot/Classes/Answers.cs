@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -117,9 +118,11 @@ public static class AnswersMethods
         int idOfInsight = 0
         )
     {
-        // тут можно переписать чтобы сразу корректно подтягивались данные
-        var currentUserFromDb = DbHelper.db.Users.Find(currentUserTgId); //юзер который запросил мысль
-        DbHelper.db.Entry(currentUserFromDb).Collection(c => c.Insights).Load();
+        // получаем пользователя и его список инсайтов из DB
+        var currentUserFromDb =
+            DbHelper.db.Users
+                .Include(user => user.Insights)
+                .FirstOrDefault(user => user.TelegramId == currentUserTgId);
 
         string textOfCurrentUserInsight;
         int idOfCurrentUserInsightInDb = 0;
