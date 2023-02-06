@@ -98,14 +98,21 @@ public static class AnswersMethods
             }
 
             DbHelper.db.Users.Add(newUser); // добавляем в таблицу нового пользователя
-            
-            AnswersMethods.SendMessage(
-                message.Chat.Id,
-                "Вы были добавлены в список пользователей.\n" +
-                "В этом боте вы можете сохранять значимые для себя мысли. " +
-                "Каждое утро бот будет присылать по одной из них.\n" +
-                "Для добавления мысли нажмите /add_new_insight",
-                out int idOfMessage);
+
+            try
+            {
+                AnswersMethods.SendMessage(
+                    message.Chat.Id,
+                    "Вы были добавлены в список пользователей.\n" +
+                    "В этом боте вы можете сохранять значимые для себя мысли. " +
+                    "Каждое утро бот будет присылать по одной из них.\n" +
+                    "Для добавления мысли нажмите /add_new_insight",
+                    out int idOfMessage);
+            }
+            catch (Exception e)
+            {
+                newUser.isAsign = false;
+            }
             
             // сохраняем изменения в таблице
             await DbHelper.db.SaveChangesAsync(token); // разобраться что это за токен такой и для чего он нужен
