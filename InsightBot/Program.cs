@@ -54,6 +54,7 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
         if (UserFromDb is null)
         {
             AnswersMethods.Start(botClient, message, currentUserTgId, token);
+            UserFromDb = DbHelper.db.Users.Find(currentUserTgId);
         }
 
         if (UserFromDb.isAsign == false)
@@ -86,12 +87,6 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                         DbHelper.db.Users
                             .Include(user => user.Insights)
                             .FirstOrDefault(user => user.TelegramId == currentUserTgId);
-
-                    if (UserFromDb is null)
-                    {
-                        AnswersMethods.Start(botClient, message, currentUserTgId, token);
-                        UserFromDb = DbHelper.db.Users.Find(currentUserTgId);
-                    }
 
                     UserFromDb.GetRandomInsight(out var textOfRandomInsight, out var idRandomInsight);
                     AnswersMethods.SendInsight(textOfRandomInsight, idRandomInsight, currentUserTgId);
@@ -240,6 +235,10 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                     callbackQueryId,
                     SetRegularRepeatition,
                     information);
+                
+                // обновляем кнопки
+                AnswersMethods.CreateRegularReptitionInlineButtons(idOfInsight, out var inlineKeyboard, messageId);
+                TelegramBotHelper.Client.EditMessageReplyMarkupAsync(userTelegramId, messageId, inlineKeyboard);
                 break;
             }
 
@@ -257,6 +256,10 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                     callbackQueryId,
                     SetRegularRepeatition,
                     information);
+                
+                // обновляем кнопки
+                AnswersMethods.CreateRegularReptitionInlineButtons(idOfInsight, out var inlineKeyboard, messageId);
+                TelegramBotHelper.Client.EditMessageReplyMarkupAsync(userTelegramId, messageId, inlineKeyboard);
                 break;
             }
             case "Повторять еженедельно":
@@ -273,6 +276,10 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                     callbackQueryId,
                     SetRegularRepeatition,
                     information);
+                
+                // обновляем кнопки
+                AnswersMethods.CreateRegularReptitionInlineButtons(idOfInsight, out var inlineKeyboard, messageId);
+                TelegramBotHelper.Client.EditMessageReplyMarkupAsync(userTelegramId, messageId, inlineKeyboard);
                 break;
             }
             case "Регулярное повторение":

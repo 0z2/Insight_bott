@@ -222,27 +222,46 @@ public static class AnswersMethods
     public static void CreateRegularReptitionInlineButtons(int idInsightInDb, out InlineKeyboardMarkup inlineKeyboard, int? messageId=null)
     {
         // пример создания инлайн кнопок https://stackoverflow.com/questions/62797191/how-to-add-two-inline-buttons-to-a-telegram-bot-by-c
+
+        var insight = DbHelper.db.Insights.Find(idInsightInDb);
+        var symbolOfActiveButtonEveryDay = "";
+        var symbolOfActiveButtonInADay = "";
+        var symbolOfActiveButtonAweek = "";
+        
+        switch (insight.HowOftenRepeatInDays)
+        {
+            case 1:
+                symbolOfActiveButtonEveryDay = " ✅";
+                break;
+            case 2:
+                symbolOfActiveButtonInADay = " ✅";
+                break;
+            case 7:
+                symbolOfActiveButtonAweek = " ✅";
+                break;
+        }
         
         // создаем кнопки инсайтов
         InlineKeyboardButton backButton = new InlineKeyboardButton("Назад");
         backButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Назад" + "," + messageId);
             
-        InlineKeyboardButton repeatDailyButton = new InlineKeyboardButton("Повторять ежедневно");
+        InlineKeyboardButton repeatDailyButton = new InlineKeyboardButton("Повторять ежедневно" + symbolOfActiveButtonEveryDay);
         repeatDailyButton.CallbackData = Convert.ToString(idInsightInDb) + "," + "Повторять ежедневно" + "," + messageId;
 
-        InlineKeyboardButton repeatInADayButton = new InlineKeyboardButton("Повторять через день");
+        InlineKeyboardButton repeatInADayButton = new InlineKeyboardButton("Повторять через день" + symbolOfActiveButtonInADay);
         repeatInADayButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Повторять через день" + "," + messageId);
             
-        InlineKeyboardButton repeatWeeklyButton = new InlineKeyboardButton("Повторять еженедельно");
+        InlineKeyboardButton repeatWeeklyButton = new InlineKeyboardButton("Повторять еженедельно" + symbolOfActiveButtonAweek);
         repeatWeeklyButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Повторять еженедельно" + "," + messageId);
 
-        InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { repeatDailyButton, repeatInADayButton };
-        InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { repeatWeeklyButton};
-        InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { backButton };
+        InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { repeatDailyButton };
+        InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { repeatInADayButton };
+        InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { repeatWeeklyButton};
+        InlineKeyboardButton[] row4 = new InlineKeyboardButton[] { backButton };
             
         inlineKeyboard = new InlineKeyboardMarkup(new[]
         {
-            row1, row2, row3
+            row1, row2, row3, row4
         });
     }
     
