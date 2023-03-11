@@ -38,7 +38,7 @@ namespace Insight_bott.Jobs
                     // ежедневный инсайт
                     user.GetCurrentInsight(out string textOfCurrentInsight, out int idInsightInDb);
                     AnswersMethods.SendInsight(textOfCurrentInsight, idInsightInDb, user.TelegramId);
-                    
+
                     // проссматриваем инсайты
                     foreach (Insight insight in user.Insights)
                     {
@@ -49,6 +49,7 @@ namespace Insight_bott.Jobs
                             insight.WhenToRepeat = null;
                             insight.DayOfLastRepeat = DateTime.Today;
                         }
+
                         // если установлено регулярное повторение
                         if (insight.HowOftenRepeatInDays is not null)
                         {
@@ -66,12 +67,13 @@ namespace Insight_bott.Jobs
                 catch (ArgumentOutOfRangeException)
                 {
                     // если у пользователя нет ни одного инсайта
-                    AnswersMethods.SendMessage(user.TelegramId, 
+                    AnswersMethods.SendMessage(user.TelegramId,
                         "У вас не сохранено ни одного инсайта.\n" +
                         "Для добавления нового инасайте нажмите на /add_new_insight " +
                         "и затем напишите текст инсайта.",
                         out int idOfMessage);
                 }
+
             }
             await DbHelper.db.SaveChangesAsync();
         }

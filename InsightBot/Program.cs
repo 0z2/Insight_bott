@@ -323,6 +323,9 @@ async Task Update(ITelegramBotClient botClient, Update update, CancellationToken
                     callbackQueryId,
                     clearRepetition,
                     information);
+                
+                AnswersMethods.CreateBaseInlineButtons(idOfInsight, out var inlineKeyboard, messageId);
+                await TelegramBotHelper.Client.EditMessageReplyMarkupAsync(userTelegramId, messageId, inlineKeyboard);
                 break;
             }
         }

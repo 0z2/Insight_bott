@@ -42,9 +42,11 @@ public static class AnswersMethods
             }
 
         }
-        catch (Telegram.Bot.Exceptions.ApiRequestException e)
+        catch (Exception e)
         {
-            if (e.Message == "Forbidden: bot was blocked by the user")
+            if (e.Message == "Forbidden: bot was blocked by the user"
+                || e.Message == "One or more errors occurred. (Forbidden: bot was blocked by the user)"
+                || e.Message == "One or more errors occurred. (Forbidden: user is deactivated)")
             {
                 // отмечаем что юзер заблокировал сообщения
                 var UserFromDb = DbHelper.db.Users.Find(UserTgId); //юзер который запросил мысль
@@ -60,7 +62,7 @@ public static class AnswersMethods
                 throw;
             }
         }
-        
+
     }
     
     public static async void Start(
@@ -168,30 +170,35 @@ public static class AnswersMethods
 
     public static void CreateBaseInlineButtons(int idInsightInDb, out InlineKeyboardMarkup inlineKeyboard, int? messageId=null)
     {
-        // пример создания инлайн кнопок https://stackoverflow.com/questions/62797191/how-to-add-two-inline-buttons-to-a-telegram-bot-by-c
+        var insight = DbHelper.db.Insights.Find(idInsightInDb);
+        var insightHasRepeat = insight.HowOftenRepeatInDays != null;
         
         // создаем кнопки инсайтов
-        InlineKeyboardButton regularRepeatButton = new InlineKeyboardButton("Регулярное повторение");
+        var regularRepeatButton = new InlineKeyboardButton("Регулярное повторение");
         regularRepeatButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Регулярное повторение" + "," + messageId);
             
-        InlineKeyboardButton singleRepititionButton = new InlineKeyboardButton("Разовое повторение");
+        var singleRepititionButton = new InlineKeyboardButton("Разовое повторение");
         singleRepititionButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Разовое повторение"  + "," + messageId);
         
-        InlineKeyboardButton deleteRepititionButton = new InlineKeyboardButton("Отключить повторения");
+        var deleteRepititionButton = new InlineKeyboardButton("Отключить повторения");
         deleteRepititionButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Отключить повторения" + "," + messageId);
         
-        InlineKeyboardButton deleteButton = new InlineKeyboardButton("Удалить");
-        deleteButton.CallbackData = Convert.ToString(idInsightInDb + "," + "Удалить" + "," + messageId);
+        var deleteInsight = new InlineKeyboardButton("Удалить");
+        deleteInsight.CallbackData = Convert.ToString(idInsightInDb + "," + "Удалить" + "," + messageId);
 
-        InlineKeyboardButton[] row1 = new InlineKeyboardButton[] { regularRepeatButton, singleRepititionButton };
-        InlineKeyboardButton[] row2 = new InlineKeyboardButton[] { deleteRepititionButton };
-        InlineKeyboardButton[] row3 = new InlineKeyboardButton[] { deleteButton };
+        var row1 = new List<InlineKeyboardButton> { regularRepeatButton, singleRepititionButton };
+        var row2 = new List<InlineKeyboardButton> { deleteRepititionButton };
+        var row3 = new List<InlineKeyboardButton> { deleteInsight };
 
-        inlineKeyboard = new InlineKeyboardMarkup(new[]
+        List<List<InlineKeyboardButton>> keyboard = new List<List<InlineKeyboardButton>>();
+        keyboard.Add(row1);
+        if (insightHasRepeat)
         {
-            row1, row2, row3
-        });
+            keyboard.Add(row2);
+        }
+        keyboard.Add(row3);
         
+        inlineKeyboard = new InlineKeyboardMarkup(keyboard);
     }
     public static void CreateSingleReptitionInlineButtons(int idInsightInDb, out InlineKeyboardMarkup inlineKeyboard, int? messageId=null)
     {
